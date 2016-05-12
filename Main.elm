@@ -1,8 +1,8 @@
 module Main exposing (main)
 
-import Html.App as Html
-import Card exposing (model, view, update)
+import Html.App
+import CardList
 
 
 main =
-    Html.beginnerProgram { model = model, view = view, update = update }
+    Html.App.beginnerProgram { model = CardList.model, view = CardList.view, update = CardList.update }

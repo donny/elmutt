@@ -1,4 +1,4 @@
-module Card exposing (model, view, update)
+module Card exposing (Model, Msg, model, view, update)
 
 import Html exposing (Html, div, input, button, h1, text)
 import Html.Attributes exposing (value, type')
