@@ -1,4 +1,4 @@
-module Main exposing (main)
+module App exposing (main)
 
 import Html.App
 import CardList
