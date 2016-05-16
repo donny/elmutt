@@ -1,4 +1,4 @@
-module CardList exposing (model, view, update)
+module CardList exposing (Model, Msg, model, view, update)
 
 import Card
 import Html exposing (Html, div)
@@ -33,10 +33,6 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "mdl-grid" ]
-        [ div [ class "mdl-cell mdl-cell--4-col" ]
-            [ map Top (Card.view model.topCard)
-            ]
-        , div [ class "mdl-cell mdl-cell--4-col" ]
-            [ map Bottom (Card.view model.bottomCard)
-            ]
+        [ map Top (Card.view model.topCard)
+        , map Bottom (Card.view model.bottomCard)
         ]

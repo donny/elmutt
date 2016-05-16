@@ -1,6 +1,6 @@
 module Card exposing (Model, Msg, model, view, update)
 
-import Html exposing (Html, div, input, button, h3, text, p, i, h4, span, ul, li)
+import Html exposing (Html, div, input, button, h3, h6, text, p, i, h4, span, ul, li)
 import Html.Attributes exposing (class, value, type', disabled)
 import Html.Events exposing (onInput, onClick)
 
@@ -43,24 +43,28 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "mdl-card mdl-shadow--2dp" ]
+    div [ class "mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp" ]
         [ div [ class "mdl-card__title mdl-card--expand" ]
             [ if model.isEditingText then
                 input [ type' "text", onInput TextChanged, value model.text ] []
               else
-                h3 [ onClick StartEditingText ] [ text model.text ]
+                p [ onClick StartEditingText ] [ text model.text ]
             ]
         , div [ class "mdl-card__actions mdl-card--border" ]
             [ if model.isEditingText then
-                button [ class "mdl-button mdl-js-button", onClick FinishEditingText ]
+                button [ class "mdl-button mdl-js-button mdl-button--icon", onClick FinishEditingText ]
                     [ i [ class "material-icons" ] [ text "done" ] ]
               else
-                button [ class "mdl-button mdl-js-button", onClick StartEditingText ]
-                    [ i [ class "material-icons" ] [ text "edit" ] ]
-            , button [ class "mdl-button mdl-js-button", onClick Increment ]
+                button [ class "mdl-button mdl-js-button mdl-button--icon", onClick StartEditingText ]
+                    [ i [ class "material-icons" ] [ text "short_text" ] ]
+            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Increment ]
                 [ i [ class "material-icons" ] [ text "add" ] ]
-            , button [ class "mdl-button mdl-js-button", onClick Decrement ]
+            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Decrement ]
                 [ i [ class "material-icons" ] [ text "remove" ] ]
+            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Decrement ]
+                [ i [ class "material-icons" ] [ text "clear" ] ]
+            , span [ class "mdl-layout-spacer" ] [ text "    " ]
+            , button [ class "mdl-button mdl-js-button mdl-button--icon", disabled True ]
+                [ span [ class "mdl-color-text--accent" ] [ text (toString model.counter) ] ]
             ]
-        , div [ class "mdl-card__menu" ] [ h4 [ class "mdl-color-text--primary" ] [ text (toString model.counter) ] ]
         ]

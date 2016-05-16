@@ -1,9 +1,9 @@
 module App exposing (main)
 
 import Html.App
-import CardList
+import Board
 
 
 main : Program Never
 main =
-    Html.App.beginnerProgram { model = CardList.model, view = CardList.view, update = CardList.update }
+    Html.App.beginnerProgram { model = Board.model, view = Board.view, update = Board.update }
