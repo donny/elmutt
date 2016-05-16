@@ -1,6 +1,6 @@
 module Card exposing (Model, Msg, model, view, update)
 
-import Html exposing (Html, div, input, button, h1, text, p, i, h4, span, ul, li)
+import Html exposing (Html, div, input, button, h3, text, p, i, h4, span, ul, li)
 import Html.Attributes exposing (class, value, type', disabled)
 import Html.Events exposing (onInput, onClick)
 
@@ -46,15 +46,18 @@ view model =
     div [ class "mdl-card mdl-shadow--2dp" ]
         [ div [ class "mdl-card__title mdl-card--expand" ]
             [ if model.isEditingText then
-                div []
-                    [ input [ type' "text", onInput TextChanged, value model.text ] []
-                    , button [ onClick FinishEditingText ] [ text "Save" ]
-                    ]
+                input [ type' "text", onInput TextChanged, value model.text ] []
               else
-                h1 [ onClick StartEditingText ] [ text model.text ]
+                h3 [ onClick StartEditingText ] [ text model.text ]
             ]
         , div [ class "mdl-card__actions mdl-card--border" ]
-            [ button [ class "mdl-button mdl-js-button", onClick Increment ]
+            [ if model.isEditingText then
+                button [ class "mdl-button mdl-js-button", onClick FinishEditingText ]
+                    [ i [ class "material-icons" ] [ text "done" ] ]
+              else
+                button [ class "mdl-button mdl-js-button", onClick StartEditingText ]
+                    [ i [ class "material-icons" ] [ text "edit" ] ]
+            , button [ class "mdl-button mdl-js-button", onClick Increment ]
                 [ i [ class "material-icons" ] [ text "add" ] ]
             , button [ class "mdl-button mdl-js-button", onClick Decrement ]
                 [ i [ class "material-icons" ] [ text "remove" ] ]
