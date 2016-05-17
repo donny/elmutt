@@ -1,7 +1,7 @@
 module Board exposing (model, view, update)
 
 import CardList
-import Html exposing (Html, div)
+import Html exposing (Html, div, text, h3)
 import Html.Attributes exposing (class)
 import Html.App exposing (map)
 
@@ -32,11 +32,21 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "mdl-grid" ]
-        [ div [ class "mdl-cell mdl-cell--6-col" ]
-            [ map Top (CardList.view model.topBoard)
+    div [ class "row" ]
+        [ div [ class "col-md-6" ]
+            [ div [ class "panel panel-default" ]
+                [ div [ class "panel-heading" ]
+                    [ h3 [ class "panel-title" ] [ text "hello" ]
+                    ]
+                , map Top (CardList.view model.topBoard)
+                ]
             ]
-        , div [ class "mdl-cell mdl-cell--6-col" ]
-            [ map Bottom (CardList.view model.bottomBoard)
+        , div [ class "col-md-6" ]
+            [ div [ class "panel panel-default" ]
+                [ div [ class "panel-heading" ]
+                    [ h3 [ class "panel-title" ] [ text "hello" ]
+                    ]
+                , map Bottom (CardList.view model.bottomBoard)
+                ]
             ]
         ]

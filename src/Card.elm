@@ -1,7 +1,7 @@
 module Card exposing (Model, Msg, model, view, update)
 
-import Html exposing (Html, div, input, button, h3, h6, text, p, i, h4, span, ul, li)
-import Html.Attributes exposing (class, value, type', disabled)
+import Html exposing (Html, div, input, button, h3, h6, text, p, i, h4, span, ul, li, a)
+import Html.Attributes exposing (class, value, type', disabled, readonly, attribute)
 import Html.Events exposing (onInput, onClick)
 
 
@@ -45,26 +45,35 @@ view : Model -> Html Msg
 view model =
     div [ class "mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp" ]
         [ div [ class "mdl-card__title mdl-card--expand" ]
-            [ if model.isEditingText then
-                input [ type' "text", onInput TextChanged, value model.text ] []
-              else
-                p [ onClick StartEditingText ] [ text model.text ]
-            ]
-        , div [ class "mdl-card__actions mdl-card--border" ]
-            [ if model.isEditingText then
-                button [ class "mdl-button mdl-js-button mdl-button--icon", onClick FinishEditingText ]
-                    [ i [ class "material-icons" ] [ text "done" ] ]
-              else
-                button [ class "mdl-button mdl-js-button mdl-button--icon", onClick StartEditingText ]
-                    [ i [ class "material-icons" ] [ text "short_text" ] ]
-            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Increment ]
-                [ i [ class "material-icons" ] [ text "add" ] ]
-            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Decrement ]
-                [ i [ class "material-icons" ] [ text "remove" ] ]
-            , button [ class "mdl-button mdl-js-button mdl-button--icon", onClick Decrement ]
-                [ i [ class "material-icons" ] [ text "clear" ] ]
-            , span [ class "mdl-layout-spacer" ] [ text "    " ]
-            , button [ class "mdl-button mdl-js-button mdl-button--icon", disabled True ]
-                [ span [ class "mdl-color-text--accent" ] [ text (toString model.counter) ] ]
+            [ div [ class "input-group" ]
+                [ div [ class "input-group-btn" ]
+                    [ button [ class "btn btn-default dropdown-toggle", attribute "data-toggle" "dropdown" ] [ text (toString model.counter ++ "  "), span [ class "caret" ] [] ]
+                    , ul [ class "dropdown-menu" ]
+                        [ li []
+                            [ a [ onClick Increment ] [ text " Thumbs Up" ]
+                            ]
+                        , li [ class "divider" ] []
+                        , li []
+                            [ a [ onClick Decrement ] [ text " Thumbs Down" ]
+                            ]
+                        ]
+                    ]
+                , if model.isEditingText then
+                    input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
+                  else
+                    input [ type' "text", class "form-control", onClick StartEditingText, value model.text, disabled True ] []
+                , div [ class "input-group-btn" ]
+                    [ if model.isEditingText then
+                        button [ class "btn btn-default", onClick FinishEditingText ]
+                            [ i [ class "fa fa-check-square-o" ] [] ]
+                      else
+                        button [ class "btn btn-default", onClick StartEditingText ]
+                            [ i [ class "fa fa-pencil-square-o" ] [] ]
+                    , button [ class "btn btn-default dropdown-toggle", attribute "data-toggle" "dropdown" ] [ i [ class "fa fa-trash-o" ] [] ]
+                    , ul [ class "dropdown-menu" ]
+                        [ li [] [ a [] [ text "Confirm Delete" ] ]
+                        ]
+                    ]
+                ]
             ]
         ]
