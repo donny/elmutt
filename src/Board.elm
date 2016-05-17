@@ -53,17 +53,10 @@ view : Model -> Html Msg
 view model =
     let
         cardListView ( listID, listModel ) =
-            div [ class "col-md-6" ]
-                [ div [ class "panel panel-default" ]
-                    [ div [ class "panel-heading" ]
-                        [ h3 [ class "panel-title" ] [ text "hello" ]
-                        ]
-                    , map (\model -> Modify listID model) (CardList.view listModel)
-                    ]
-                ]
+            map (\model -> Modify listID model) (CardList.view listModel)
 
         cardListViews =
-            List.map cardListView model.lists
+            div [ class "row" ] (List.map cardListView model.lists)
     in
         div [ class "page-content" ]
             [ div [ class "row" ]
@@ -78,6 +71,5 @@ view model =
                         ]
                     ]
                 ]
-            , div [ class "row" ]
-                cardListViews
+            , cardListViews
             ]
