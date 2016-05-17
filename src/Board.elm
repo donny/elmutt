@@ -1,52 +1,83 @@
 module Board exposing (model, view, update)
 
 import CardList
-import Html exposing (Html, div, text, h3)
+import Html exposing (Html, div, text, h3, button)
 import Html.Attributes exposing (class)
 import Html.App exposing (map)
+import Html.Events exposing (onClick)
+
+
+type alias ID =
+    Int
 
 
 type alias Model =
-    { topBoard : CardList.Model, bottomBoard : CardList.Model }
+    { lists : List ( ID, CardList.Model ), nextID : ID }
 
 
 model : Model
 model =
-    { topBoard = CardList.model, bottomBoard = CardList.model }
+    { lists = [], nextID = 0 }
 
 
 type Msg
-    = Top CardList.Msg
-    | Bottom CardList.Msg
+    = Insert
+    | Modify ID CardList.Msg
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Top m ->
-            { model | topBoard = CardList.update m model.topBoard }
+        Insert ->
+            let
+                newList =
+                    ( model.nextID, CardList.model )
 
-        Bottom m ->
-            { model | bottomBoard = CardList.update m model.bottomBoard }
+                newLists =
+                    model.lists ++ [ newList ]
+            in
+                { model | lists = newLists, nextID = model.nextID + 1 }
+
+        Modify id listMsg ->
+            let
+                updateList ( listID, listModel ) =
+                    if listID == id then
+                        ( listID, CardList.update listMsg listModel )
+                    else
+                        ( listID, listModel )
+            in
+                { model | lists = List.map updateList model.lists }
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "row" ]
-        [ div [ class "col-md-6" ]
-            [ div [ class "panel panel-default" ]
-                [ div [ class "panel-heading" ]
-                    [ h3 [ class "panel-title" ] [ text "hello" ]
+    let
+        cardListView ( listID, listModel ) =
+            div [ class "col-md-6" ]
+                [ div [ class "panel panel-default" ]
+                    [ div [ class "panel-heading" ]
+                        [ h3 [ class "panel-title" ] [ text "hello" ]
+                        ]
+                    , map (\model -> Modify listID model) (CardList.view listModel)
                     ]
-                , map Top (CardList.view model.topBoard)
                 ]
-            ]
-        , div [ class "col-md-6" ]
-            [ div [ class "panel panel-default" ]
-                [ div [ class "panel-heading" ]
-                    [ h3 [ class "panel-title" ] [ text "hello" ]
+
+        cardListViews =
+            List.map cardListView model.lists
+    in
+        div [ class "page-content" ]
+            [ div [ class "row" ]
+                [ div [ class "col-md-12" ]
+                    [ div [ class "panel panel-default" ]
+                        [ div [ class "panel-body" ]
+                            [ div [ class "btn-group" ]
+                                [ button [ class "btn btn-default", onClick Insert ]
+                                    [ text "New List" ]
+                                ]
+                            ]
+                        ]
                     ]
-                , map Bottom (CardList.view model.bottomBoard)
                 ]
+            , div [ class "row" ]
+                cardListViews
             ]
-        ]
