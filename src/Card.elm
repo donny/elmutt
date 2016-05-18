@@ -41,9 +41,14 @@ view : Model -> Html Msg
 view model =
     div [ class "card" ]
         [ div [ class "card-block" ]
-            [ div [ class "btn-group btn-group-sm" ]
+            [ if model.isEditingText then
+                input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
+              else
+                h5 [ class "card-title" ] [ text model.text ]
+            , br [] []
+            , div [ class "btn-group dropup btn-group-sm" ]
                 [ button [ class "btn btn-secondary", onClick Increment ]
-                    [ text (toString model.counter ++ "\x00A0\x00A0"), i [ class "fa fa-thumbs-o-up" ] [] ]
+                    [ text (toString model.counter ++ "  "), i [ class "fa fa-thumbs-o-up" ] [] ]
                 , if model.isEditingText then
                     button [ class "btn btn-secondary", onClick FinishEditingText ]
                         [ i [ class "fa fa-check-square-o" ] [] ]
@@ -56,11 +61,5 @@ view model =
                     [ a [ class "dropdown-item" ] [ text "Delete" ]
                     ]
                 ]
-            , br [] []
-            , br [] []
-            , if model.isEditingText then
-                input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
-              else
-                h5 [ class "card-title" ] [ text model.text ]
             ]
         ]
