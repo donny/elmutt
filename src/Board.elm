@@ -1,7 +1,7 @@
 module Board exposing (model, view, update)
 
 import CardList
-import Html exposing (Html, div, text, h3, button)
+import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.App exposing (map)
 import Html.Events exposing (onClick)
@@ -58,18 +58,13 @@ view model =
         cardListViews =
             div [ class "row" ] (List.map cardListView model.lists)
     in
-        div [ class "page-content" ]
-            [ div [ class "row" ]
-                [ div [ class "col-md-12" ]
-                    [ div [ class "panel panel-default" ]
-                        [ div [ class "panel-body" ]
-                            [ div [ class "btn-group" ]
-                                [ button [ class "btn btn-default", onClick Insert ]
-                                    [ text "New List" ]
-                                ]
-                            ]
-                        ]
+        div []
+            [ nav [ class "navbar navbar-light" ]
+                [ h1 [ class "navbar-brand" ] [ text "IdeaBoard" ]
+                , div [ class "pull-right" ]
+                    [ button [ class "btn btn-secondary", onClick Insert ] [ text "New List" ]
                     ]
                 ]
+            , br [] []
             , cardListViews
             ]

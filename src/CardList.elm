@@ -53,22 +53,18 @@ view : Model -> Html Msg
 view model =
     let
         cardView ( cardID, cardModel ) =
-            li [ class "list-group-item" ] [ map (Modify cardID) (Card.view cardModel) ]
+            map (Modify cardID) (Card.view cardModel)
 
         cardViews =
-            List.map cardView model.cards
+            div [ class "card-columns" ] (List.map cardView model.cards)
     in
         div [ class "col-md-6" ]
-            [ div [ class "panel panel-default" ]
-                [ div [ class "panel-heading" ]
-                    [ div [ class "input-group" ]
-                        [ input [ type' "text", class "form-control", value "List", disabled True ] []
-                        , div [ class "input-group-btn" ]
-                            [ button [ class "btn btn-default", onClick Insert ]
-                                [ i [ class "fa fa-plus" ] [] ]
-                            ]
-                        ]
+            [ nav [ class "navbar navbar-light bg-faded" ]
+                [ h1 [ class "navbar-brand" ] [ text "List" ]
+                , div [ class "pull-right" ]
+                    [ button [ class "btn btn-secondary", onClick Insert ] [ text "New Card" ]
                     ]
-                , ul [ class "list-group" ] cardViews
                 ]
+            , br [] []
+            , cardViews
             ]
