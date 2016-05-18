@@ -11,7 +11,7 @@ type alias Model =
 
 model : Model
 model =
-    Model 0 "Text" False
+    Model 0 "Untitled" False
 
 
 type Msg

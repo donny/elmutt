@@ -4,7 +4,7 @@ import Card
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.App exposing (map)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onInput, onClick)
 
 
 type alias ID =
@@ -12,22 +12,34 @@ type alias ID =
 
 
 type alias Model =
-    { cards : List ( ID, Card.Model ), nextID : ID }
+    { text : String, isEditingText : Bool, cards : List ( ID, Card.Model ), nextID : ID }
 
 
 model : Model
 model =
-    { cards = [], nextID = 0 }
+    { text = "Untitled", isEditingText = False, cards = [], nextID = 0 }
 
 
 type Msg
-    = Insert
+    = StartEditingText
+    | FinishEditingText
+    | TextChanged String
+    | Insert
     | Modify ID Card.Msg
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        StartEditingText ->
+            { model | isEditingText = True }
+
+        TextChanged newText ->
+            { model | text = newText }
+
+        FinishEditingText ->
+            { model | isEditingText = False }
+
         Insert ->
             let
                 newCard =
@@ -60,9 +72,18 @@ view model =
     in
         div [ class "col-md-6" ]
             [ nav [ class "navbar navbar-light bg-faded" ]
-                [ h1 [ class "navbar-brand" ] [ text "List" ]
-                , div [ class "pull-right" ]
-                    [ button [ class "btn btn-secondary", onClick Insert ] [ text "New Card" ]
+                [ if model.isEditingText then
+                    input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
+                  else
+                    h1 [ class "navbar-brand" ] [ text model.text ]
+                , div [ class "btn-group pull-right" ]
+                    [ if model.isEditingText then
+                        button [ class "btn btn-secondary", onClick FinishEditingText ]
+                            [ i [ class "fa fa-check-square-o" ] [] ]
+                      else
+                        button [ class "btn btn-secondary", onClick StartEditingText ]
+                            [ i [ class "fa fa-pencil-square-o" ] [] ]
+                    , button [ class "btn btn-secondary", onClick Insert ] [ i [ class "fa fa-plus" ] [] ]
                     ]
                 ]
             , br [] []
