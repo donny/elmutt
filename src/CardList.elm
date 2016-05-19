@@ -1,4 +1,4 @@
-module CardList exposing (Model, Msg, Dispatch(Rename), model, view, update)
+module CardList exposing (Model, Msg(Insert), Dispatch(Rename, NewCard), model, view, update)
 
 import Card
 import Html exposing (..)
@@ -10,26 +10,28 @@ import Debug
 
 type Dispatch
     = Rename String
+    | NewCard
 
 
 type alias ID =
-    Int
+    String
 
 
 type alias Model =
-    { text : String, isEditingText : Bool, cards : List ( ID, Card.Model ), nextID : ID }
+    { text : String, isEditingText : Bool, cards : List ( ID, Card.Model ) }
 
 
 model : Model
 model =
-    { text = "Untitled", isEditingText = False, cards = [], nextID = 0 }
+    { text = "Untitled", isEditingText = False, cards = [] }
 
 
 type Msg
     = StartEditingText
     | FinishEditingText
     | TextChanged String
-    | Insert
+    | Insert String String
+    | InsertNewCard
     | Modify ID Card.Msg
 
 
@@ -45,15 +47,21 @@ update msg model =
         FinishEditingText ->
             ( { model | isEditingText = False }, Just (Rename model.text) )
 
-        Insert ->
+        InsertNewCard ->
+            ( model, Just (NewCard))
+
+        Insert identifier text ->
             let
+                newModel =
+                    Card.model
+
                 newCard =
-                    ( model.nextID, Card.model )
+                    ( identifier, { newModel | text = text } )
 
                 newCards =
                     model.cards ++ [ newCard ]
             in
-                ( { model | cards = newCards, nextID = model.nextID + 1 }, Nothing )
+                ( { model | cards = newCards }, Nothing )
 
         Modify id cardMsg ->
             let
@@ -88,7 +96,7 @@ view model =
                       else
                         button [ class "btn btn-secondary", onClick StartEditingText ]
                             [ i [ class "fa fa-pencil-square-o" ] [] ]
-                    , button [ class "btn btn-secondary", onClick Insert ] [ i [ class "fa fa-plus" ] [] ]
+                    , button [ class "btn btn-secondary", onClick InsertNewCard ] [ i [ class "fa fa-plus" ] [] ]
                     ]
                 ]
             , br [] []

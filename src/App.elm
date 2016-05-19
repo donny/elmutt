@@ -44,6 +44,7 @@ type Msg
     | Insert String String
     | Rename String String
     | Modify ID CardList.Msg
+    | AddNewCard String String String
     | SendNetworkRequest NetworkRequest
     | NetworkResponseDidReceive String
 
@@ -66,6 +67,16 @@ update msg model =
                     model.lists ++ [ newList ]
             in
                 ( { model | lists = newLists }, Cmd.none )
+
+        AddNewCard identifier text listidentifier ->
+            let
+                updateCardList ( listID, listModel ) =
+                    if listID == listidentifier then
+                        ( listID, fst (CardList.update (CardList.Insert identifier text) listModel))
+                    else
+                        ( listID, listModel )
+            in
+                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
 
         Rename identifier text ->
             let
@@ -102,6 +113,9 @@ update msg model =
 
                     Just (CardList.Rename newName) ->
                         networkRequestHandler (REQ_RENAMELIST id newName) newModel
+
+                    Just (CardList.NewCard) ->
+                        networkRequestHandler (REQ_NEWCARD id) newModel
 
         SendNetworkRequest req ->
             networkRequestHandler req model
@@ -165,12 +179,14 @@ type NetworkRequest
     | REQ_REFRESH
     | REQ_NEWLIST
     | REQ_RENAMELIST String String
+    | REQ_NEWCARD String
 
 
 type NetworkResponse
     = RESP_ERROR
     | RESP_NEWLIST String String
     | RESP_RENAMELIST String String
+    | RESP_NEWCARD String String String
 
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
@@ -192,6 +208,13 @@ networkRequestHandler req model =
             in
                 ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
 
+        REQ_NEWCARD identifier  ->
+            let
+                requestString =
+                    "{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}"
+            in
+                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
@@ -201,6 +224,9 @@ networkResponseHandler resp model =
 
         RESP_RENAMELIST identifier text ->
             update (Rename identifier text) { model | isProcessing = False }
+
+        RESP_NEWCARD identifier text listidentifier ->
+            update (AddNewCard identifier text listidentifier) { model | isProcessing = False }
 
         RESP_ERROR ->
             update NoOp model
@@ -237,6 +263,18 @@ decodeNetworkResponse message =
 
                             Ok ( identifier, text ) ->
                                 RESP_RENAMELIST identifier text
+
+                "NEWCARD" ->
+                    let
+                        parsedCardList =
+                            object3 (,,) ("IDENTIFIER" := string) ("TEXT" := string) ("LISTIDENTIFIER" := string)
+                    in
+                        case (decodeString parsedCardList message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok ( identifier, text, listidentifier ) ->
+                                RESP_NEWCARD identifier text listidentifier
 
                 _ ->
                     RESP_ERROR
