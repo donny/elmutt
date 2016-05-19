@@ -72,7 +72,7 @@ update msg model =
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.Insert identifier text) listModel))
+                        ( listID, fst (CardList.update (CardList.Insert identifier text) listModel) )
                     else
                         ( listID, listModel )
             in
@@ -91,15 +91,14 @@ update msg model =
         Modify id listMsg ->
             let
                 updateCardList ( listID, listModel ) =
-                    case ( listID == id, CardList.update listMsg listModel ) of
-                        ( False, _ ) ->
-                            ( ( listID, listModel ), Nothing )
-
-                        ( True, ( newListModel, Nothing ) ) ->
-                            ( ( listID, newListModel ), Nothing )
-
-                        ( True, ( newListModel, dispatch ) ) ->
+                    if listID == id then
+                        let
+                            ( newListModel, dispatch ) =
+                                CardList.update listMsg listModel
+                        in
                             ( ( listID, newListModel ), dispatch )
+                    else
+                        ( ( listID, listModel ), Nothing )
 
                 ( lists, dispatches ) =
                     List.unzip (List.map updateCardList model.lists)
@@ -208,7 +207,7 @@ networkRequestHandler req model =
             in
                 ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
 
-        REQ_NEWCARD identifier  ->
+        REQ_NEWCARD identifier ->
             let
                 requestString =
                     "{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}"
