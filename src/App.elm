@@ -45,6 +45,8 @@ type Msg
     | Rename String String
     | Modify ID CardList.Msg
     | AddNewCard String String String
+    | RenameCard String String String
+    | UpVoteCard String String Int
     | SendNetworkRequest NetworkRequest
     | NetworkResponseDidReceive String
 
@@ -68,11 +70,31 @@ update msg model =
             in
                 ( { model | lists = newLists }, Cmd.none )
 
-        AddNewCard identifier text listidentifier ->
+        AddNewCard listidentifier identifier text  ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
                         ( listID, fst (CardList.update (CardList.Insert identifier text) listModel) )
+                    else
+                        ( listID, listModel )
+            in
+                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+
+        RenameCard listidentifier identifier text  ->
+            let
+                updateCardList ( listID, listModel ) =
+                    if listID == listidentifier then
+                        ( listID, fst (CardList.update (CardList.RenameCurrentCard identifier text) listModel) )
+                    else
+                        ( listID, listModel )
+            in
+                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+
+        UpVoteCard listidentifier identifier counter  ->
+            let
+                updateCardList ( listID, listModel ) =
+                    if listID == listidentifier then
+                        ( listID, fst (CardList.update (CardList.UpVoteCurrentCard identifier counter) listModel) )
                     else
                         ( listID, listModel )
             in
@@ -115,6 +137,11 @@ update msg model =
 
                     Just (CardList.NewCard) ->
                         networkRequestHandler (REQ_NEWCARD id) newModel
+                    Just (CardList.RenameCard cardIdentifier newName) ->
+                        networkRequestHandler (REQ_RENAMECARD id cardIdentifier newName) newModel
+                    Just (CardList.UpVoteCard cardIdentifier) ->
+                        networkRequestHandler (REQ_UPVOTECARD id cardIdentifier) newModel
+
 
         SendNetworkRequest req ->
             networkRequestHandler req model
@@ -179,6 +206,8 @@ type NetworkRequest
     | REQ_NEWLIST
     | REQ_RENAMELIST String String
     | REQ_NEWCARD String
+    | REQ_RENAMECARD String String String
+    | REQ_UPVOTECARD String String
 
 
 type NetworkResponse
@@ -186,6 +215,8 @@ type NetworkResponse
     | RESP_NEWLIST String String
     | RESP_RENAMELIST String String
     | RESP_NEWCARD String String String
+    | RESP_RENAMECARD String String String
+    | RESP_UPVOTECARD String String Int
 
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
@@ -214,6 +245,19 @@ networkRequestHandler req model =
             in
                 ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
 
+        REQ_RENAMECARD listidentifier cardIdentifier text ->
+            let
+                requestString =
+                    "{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++  "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
+            in
+                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+
+        REQ_UPVOTECARD listidentifier cardIdentifier ->
+            let
+                requestString =
+                    "{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++  "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}"
+            in
+                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
@@ -224,8 +268,14 @@ networkResponseHandler resp model =
         RESP_RENAMELIST identifier text ->
             update (Rename identifier text) { model | isProcessing = False }
 
-        RESP_NEWCARD identifier text listidentifier ->
-            update (AddNewCard identifier text listidentifier) { model | isProcessing = False }
+        RESP_NEWCARD listidentifier identifier text  ->
+            update (AddNewCard listidentifier identifier text) { model | isProcessing = False }
+
+        RESP_RENAMECARD listidentifier identifier text  ->
+            update (RenameCard listidentifier identifier text) { model | isProcessing = False }
+
+        RESP_UPVOTECARD listidentifier identifier counter  ->
+            update (UpVoteCard listidentifier identifier counter) { model | isProcessing = False }
 
         RESP_ERROR ->
             update NoOp model
@@ -266,14 +316,40 @@ decodeNetworkResponse message =
                 "NEWCARD" ->
                     let
                         parsedCardList =
-                            object3 (,,) ("IDENTIFIER" := string) ("TEXT" := string) ("LISTIDENTIFIER" := string)
+                            object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
                         case (decodeString parsedCardList message) of
                             Err error ->
                                 RESP_ERROR
 
-                            Ok ( identifier, text, listidentifier ) ->
-                                RESP_NEWCARD identifier text listidentifier
+                            Ok ( listidentifier, identifier, text ) ->
+                                RESP_NEWCARD listidentifier identifier text
+
+                "RENAMECARD" ->
+                    let
+                        parsedCardList =
+                            object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
+                    in
+                        case (decodeString parsedCardList message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok ( listidentifier, identifier, text ) ->
+                                RESP_RENAMECARD listidentifier identifier text
+
+                "UPVOTECARD" ->
+                    let
+                        parsedCardList =
+                            object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("COUNTER" := int)
+                    in
+                        case (decodeString parsedCardList message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok ( listidentifier, identifier, counter ) ->
+                                RESP_UPVOTECARD listidentifier identifier counter
+
+
 
                 _ ->
                     RESP_ERROR

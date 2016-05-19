@@ -1,9 +1,13 @@
-module Card exposing (Model, Msg, model, view, update)
+module Card exposing (Model, Msg, Dispatch(Rename, UpVote), model, view, update)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type', disabled, readonly, attribute)
 import Html.Events exposing (onInput, onClick)
 
+
+type Dispatch
+    = Rename String
+    | UpVote
 
 type alias Model =
     { counter : Int, text : String, isEditingText : Bool }
@@ -21,20 +25,20 @@ type Msg
     | TextChanged String
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
     case msg of
         Increment ->
-            { model | counter = model.counter + 1 }
+            ({ model | counter = model.counter + 1 }, Just (UpVote))
 
         StartEditingText ->
-            { model | isEditingText = True }
+            ({ model | isEditingText = True }, Nothing)
 
         TextChanged newText ->
-            { model | text = newText }
+            ({ model | text = newText }, Nothing)
 
         FinishEditingText ->
-            { model | isEditingText = False }
+            ( { model | isEditingText = False }, Just (Rename model.text) )
 
 
 view : Model -> Html Msg

@@ -1,4 +1,4 @@
-module CardList exposing (Model, Msg(Insert), Dispatch(Rename, NewCard), model, view, update)
+module CardList exposing (Model, Msg(Insert, RenameCurrentCard, UpVoteCurrentCard), Dispatch(Rename, NewCard, RenameCard, UpVoteCard), model, view, update)
 
 import Card
 import Html exposing (..)
@@ -11,6 +11,8 @@ import Debug
 type Dispatch
     = Rename String
     | NewCard
+    | RenameCard String String
+    | UpVoteCard String
 
 
 type alias ID =
@@ -32,6 +34,8 @@ type Msg
     | TextChanged String
     | Insert String String
     | InsertNewCard
+    | RenameCurrentCard String String
+    | UpVoteCurrentCard String Int
     | Modify ID Card.Msg
 
 
@@ -48,7 +52,28 @@ update msg model =
             ( { model | isEditingText = False }, Just (Rename model.text) )
 
         InsertNewCard ->
-            ( model, Just (NewCard))
+            ( model, Just (NewCard) )
+
+        RenameCurrentCard identifier text ->
+            let
+                updateCard ( cardID, cardModel ) =
+                    if cardID == identifier then
+                        ( cardID, { cardModel | text = text } )
+                    else
+                        ( cardID, cardModel )
+            in
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
+
+        UpVoteCurrentCard identifier counter ->
+            let
+                updateCard ( cardID, cardModel ) =
+                    if cardID == identifier then
+                        ( cardID, { cardModel | counter = counter } )
+                    else
+                        ( cardID, cardModel )
+            in
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
+
 
         Insert identifier text ->
             let
@@ -67,11 +92,29 @@ update msg model =
             let
                 updateCard ( cardID, cardModel ) =
                     if cardID == id then
-                        ( cardID, Card.update cardMsg cardModel )
+                        let
+                            ( newCardModel, dispatch ) =
+                                Card.update cardMsg cardModel
+                        in
+                            ( ( cardID, newCardModel ), dispatch )
                     else
-                        ( cardID, cardModel )
+                        ( ( cardID, cardModel ), Nothing )
+
+                ( cards, dispatches ) =
+                    List.unzip (List.map updateCard model.cards)
+
+                newModel =
+                    { model | cards = cards }
             in
-                ( { model | cards = List.map updateCard model.cards }, Nothing )
+                case (List.head (List.filterMap identity dispatches)) of
+                    Nothing ->
+                        ( newModel, Nothing )
+
+                    Just (Card.Rename newName) ->
+                        ( newModel, Just (RenameCard id newName) )
+
+                    Just (Card.UpVote) ->
+                        ( newModel, Just (UpVoteCard id) )
 
 
 view : Model -> Html Msg
