@@ -42,6 +42,7 @@ init =
 type Msg
     = NoOp
     | Insert String String
+    | Rename String String
     | Modify ID CardList.Msg
     | SendNetworkRequest NetworkRequest
     | NetworkResponseDidReceive String
@@ -49,7 +50,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "App Update " msg of
         NoOp ->
             ( model, Cmd.none )
 
@@ -66,15 +67,41 @@ update msg model =
             in
                 ( { model | lists = newLists }, Cmd.none )
 
-        Modify id listMsg ->
+        Rename identifier text ->
             let
-                updateList ( listID, listModel ) =
-                    if listID == id then
-                        ( listID, CardList.update listMsg listModel )
+                updateCardList ( listID, listModel ) =
+                    if listID == identifier then
+                        ( listID, { listModel | text = text } )
                     else
                         ( listID, listModel )
             in
-                ( { model | lists = List.map updateList model.lists }, Cmd.none )
+                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+
+        Modify id listMsg ->
+            let
+                updateCardList ( listID, listModel ) =
+                    case ( listID == id, CardList.update listMsg listModel ) of
+                        ( False, _ ) ->
+                            ( ( listID, listModel ), Nothing )
+
+                        ( True, ( newListModel, Nothing ) ) ->
+                            ( ( listID, newListModel ), Nothing )
+
+                        ( True, ( newListModel, dispatch ) ) ->
+                            ( ( listID, newListModel ), dispatch )
+
+                ( lists, dispatches ) =
+                    List.unzip (List.map updateCardList model.lists)
+
+                newModel =
+                    { model | lists = lists }
+            in
+                case (List.head (List.filterMap identity dispatches)) of
+                    Nothing ->
+                        ( newModel, Cmd.none )
+
+                    Just (CardList.Rename newName) ->
+                        networkRequestHandler (REQ_RENAMELIST id newName) newModel
 
         SendNetworkRequest req ->
             networkRequestHandler req model
@@ -137,16 +164,18 @@ type NetworkRequest
     = REQ_CONNECT
     | REQ_REFRESH
     | REQ_NEWLIST
+    | REQ_RENAMELIST String String
 
 
 type NetworkResponse
     = RESP_ERROR
     | RESP_NEWLIST String String
+    | RESP_RENAMELIST String String
 
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
 networkRequestHandler req model =
-    case req of
+    case Debug.log "DONNY RESP" req of
         REQ_CONNECT ->
             ( { model | isConnected = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NOOP"}""" )
 
@@ -156,12 +185,22 @@ networkRequestHandler req model =
         REQ_NEWLIST ->
             ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NEWLIST"}""" )
 
+        REQ_RENAMELIST identifier text ->
+            let
+                requestString =
+                    "{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
+            in
+                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
-    case resp of
+    case Debug.log "DONNY RESP" resp of
         RESP_NEWLIST identifier text ->
             update (Insert identifier text) { model | isProcessing = False }
+
+        RESP_RENAMELIST identifier text ->
+            update (Rename identifier text) { model | isProcessing = False }
 
         RESP_ERROR ->
             update NoOp model
@@ -178,7 +217,7 @@ decodeNetworkResponse message =
                 "NEWLIST" ->
                     let
                         parsedCardList =
-                            object2 (,) ("identifier" := string) ("text" := string)
+                            object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
                         case (decodeString parsedCardList message) of
                             Err error ->
@@ -186,6 +225,18 @@ decodeNetworkResponse message =
 
                             Ok ( identifier, text ) ->
                                 RESP_NEWLIST identifier text
+
+                "RENAMELIST" ->
+                    let
+                        parsedCardList =
+                            object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
+                    in
+                        case (decodeString parsedCardList message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok ( identifier, text ) ->
+                                RESP_RENAMELIST identifier text
 
                 _ ->
                     RESP_ERROR

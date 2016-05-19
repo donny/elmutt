@@ -1,10 +1,15 @@
-module CardList exposing (Model, Msg, model, view, update)
+module CardList exposing (Model, Msg, Dispatch(Rename), model, view, update)
 
 import Card
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.App exposing (map)
 import Html.Events exposing (onInput, onClick)
+import Debug
+
+
+type Dispatch
+    = Rename String
 
 
 type alias ID =
@@ -28,17 +33,17 @@ type Msg
     | Modify ID Card.Msg
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
-    case msg of
+    case Debug.log "CardList Update " msg of
         StartEditingText ->
-            { model | isEditingText = True }
+            ( { model | isEditingText = True }, Nothing )
 
         TextChanged newText ->
-            { model | text = newText }
+            ( { model | text = newText }, Nothing )
 
         FinishEditingText ->
-            { model | isEditingText = False }
+            ( { model | isEditingText = False }, Just (Rename model.text) )
 
         Insert ->
             let
@@ -48,7 +53,7 @@ update msg model =
                 newCards =
                     model.cards ++ [ newCard ]
             in
-                { model | cards = newCards, nextID = model.nextID + 1 }
+                ( { model | cards = newCards, nextID = model.nextID + 1 }, Nothing )
 
         Modify id cardMsg ->
             let
@@ -58,7 +63,7 @@ update msg model =
                     else
                         ( cardID, cardModel )
             in
-                { model | cards = List.map updateCard model.cards }
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
 
 
 view : Model -> Html Msg
