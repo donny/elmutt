@@ -7314,43 +7314,6 @@ var _donny$ideaboard$Card$view = function (model) {
 											]),
 										_elm_lang$core$Native_List.fromArray(
 											[]))
-									])),
-								A2(
-								_elm_lang$html$Html$button,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('btn btn-secondary dropdown-toggle'),
-										A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'dropdown')
-									]),
-								_elm_lang$core$Native_List.fromArray(
-									[
-										A2(
-										_elm_lang$html$Html$i,
-										_elm_lang$core$Native_List.fromArray(
-											[
-												_elm_lang$html$Html_Attributes$class('fa fa-trash-o')
-											]),
-										_elm_lang$core$Native_List.fromArray(
-											[]))
-									])),
-								A2(
-								_elm_lang$html$Html$div,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('dropdown-menu')
-									]),
-								_elm_lang$core$Native_List.fromArray(
-									[
-										A2(
-										_elm_lang$html$Html$a,
-										_elm_lang$core$Native_List.fromArray(
-											[
-												_elm_lang$html$Html_Attributes$class('dropdown-item')
-											]),
-										_elm_lang$core$Native_List.fromArray(
-											[
-												_elm_lang$html$Html$text('Delete')
-											]))
 									]))
 							]))
 					]))
