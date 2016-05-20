@@ -46,7 +46,12 @@ view : Model -> Html Msg
 view model =
     div [ class "card" ]
         [ div [ class "card-block" ]
-            [div [ class "btn-group dropup btn-group-sm" ]
+            [ if model.isEditingText then
+                input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
+              else
+                h5 [ class "card-title" ] [ text model.text ]
+            , br [] []
+            , div [ class "btn-group dropup btn-group-sm" ]
                 [ button [ class "btn btn-secondary", onClick Upvote ]
                     [ text (toString model.counter ++ "  "), i [ class "fa fa-thumbs-o-up" ] [] ]
                 , if model.isEditingText then
@@ -56,10 +61,5 @@ view model =
                     button [ class "btn btn-secondary", onClick StartEditingText ]
                         [ i [ class "fa fa-pencil-square-o" ] [] ]
                 ]
-            , br [] []
-            , if model.isEditingText then
-                input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
-              else
-                h5 [ class "card-title" ] [ text model.text ]
             ]
         ]
