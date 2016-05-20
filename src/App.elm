@@ -1,5 +1,6 @@
 module App exposing (main)
 
+import Card
 import CardList
 import Html exposing (..)
 import Html.Attributes exposing (class)
@@ -41,6 +42,7 @@ init =
 
 type Msg
     = NoOp
+    | Refresh (List ( String, String, List (String, String, Int) ))
     | Insert String String
     | Rename String String
     | Modify ID CardList.Msg
@@ -57,6 +59,28 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
+        Refresh newlist ->
+            let
+
+                updateCard (cardID, cardText, cardCounter) =
+                  let
+                    newCard = Card.model
+                  in
+                    (cardID, { newCard | text = cardText, counter = cardCounter})
+
+
+                updateCardList ( listID, listText, listCards ) =
+                    let
+                        newCardList =
+                            CardList.model
+                    in
+                        ( listID, { newCardList | text = listText, cards = (List.map updateCard listCards) } )
+
+                lists =
+                    List.map updateCardList newlist
+            in
+                ( { model | lists = lists }, Cmd.none )
+
         Insert identifier text ->
             let
                 newModel =
@@ -70,7 +94,7 @@ update msg model =
             in
                 ( { model | lists = newLists }, Cmd.none )
 
-        AddNewCard listidentifier identifier text  ->
+        AddNewCard listidentifier identifier text ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
@@ -80,7 +104,7 @@ update msg model =
             in
                 ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
 
-        RenameCard listidentifier identifier text  ->
+        RenameCard listidentifier identifier text ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
@@ -90,7 +114,7 @@ update msg model =
             in
                 ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
 
-        UpVoteCard listidentifier identifier counter  ->
+        UpVoteCard listidentifier identifier counter ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
@@ -137,11 +161,12 @@ update msg model =
 
                     Just (CardList.NewCard) ->
                         networkRequestHandler (REQ_NEWCARD id) newModel
+
                     Just (CardList.RenameCard cardIdentifier newName) ->
                         networkRequestHandler (REQ_RENAMECARD id cardIdentifier newName) newModel
+
                     Just (CardList.UpVoteCard cardIdentifier) ->
                         networkRequestHandler (REQ_UPVOTECARD id cardIdentifier) newModel
-
 
         SendNetworkRequest req ->
             networkRequestHandler req model
@@ -175,7 +200,7 @@ view model =
         if model.isConnected then
             div []
                 [ nav [ class "navbar navbar-light" ]
-                    [ button [ class "btn btn-secondary", onClick NoOp ] [ text "Refresh" ]
+                    [ button [ class "btn btn-secondary", onClick (SendNetworkRequest REQ_REFRESH) ] [ text "Refresh" ]
                     , span [] [ text " " ]
                     , button [ class "btn btn-secondary", onClick (SendNetworkRequest REQ_NEWLIST) ] [ text "New List" ]
                     , div [ class "pull-right" ]
@@ -212,6 +237,7 @@ type NetworkRequest
 
 type NetworkResponse
     = RESP_ERROR
+    | RESP_REFRESH (List ( String, String, List (String, String, Int) ))
     | RESP_NEWLIST String String
     | RESP_RENAMELIST String String
     | RESP_NEWCARD String String String
@@ -226,7 +252,7 @@ networkRequestHandler req model =
             ( { model | isConnected = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NOOP"}""" )
 
         REQ_REFRESH ->
-            ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NEWLIST"}""" )
+            ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"REFRESH"}""" )
 
         REQ_NEWLIST ->
             ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NEWLIST"}""" )
@@ -248,16 +274,17 @@ networkRequestHandler req model =
         REQ_RENAMECARD listidentifier cardIdentifier text ->
             let
                 requestString =
-                    "{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++  "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
+                    "{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
             in
                 ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
 
         REQ_UPVOTECARD listidentifier cardIdentifier ->
             let
                 requestString =
-                    "{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++  "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}"
+                    "{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}"
             in
                 ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
@@ -268,14 +295,17 @@ networkResponseHandler resp model =
         RESP_RENAMELIST identifier text ->
             update (Rename identifier text) { model | isProcessing = False }
 
-        RESP_NEWCARD listidentifier identifier text  ->
+        RESP_NEWCARD listidentifier identifier text ->
             update (AddNewCard listidentifier identifier text) { model | isProcessing = False }
 
-        RESP_RENAMECARD listidentifier identifier text  ->
+        RESP_RENAMECARD listidentifier identifier text ->
             update (RenameCard listidentifier identifier text) { model | isProcessing = False }
 
-        RESP_UPVOTECARD listidentifier identifier counter  ->
+        RESP_UPVOTECARD listidentifier identifier counter ->
             update (UpVoteCard listidentifier identifier counter) { model | isProcessing = False }
+
+        RESP_REFRESH newList ->
+            update (Refresh newList) { model | isProcessing = False }
 
         RESP_ERROR ->
             update NoOp model
@@ -283,7 +313,7 @@ networkResponseHandler resp model =
 
 decodeNetworkResponse : String -> NetworkResponse
 decodeNetworkResponse message =
-    case Debug.log "decodeNetworkResponse: " (decodeString ("RESP" := string) message) of
+    case Debug.log "decodeNetworkResponse: " (decodeString ("RESP" := string) (Debug.log "rawMessage: " message)) of
         Err error ->
             RESP_ERROR
 
@@ -349,7 +379,20 @@ decodeNetworkResponse message =
                             Ok ( listidentifier, identifier, counter ) ->
                                 RESP_UPVOTECARD listidentifier identifier counter
 
+                "REFRESH" ->
+                    let
+                        parsedCard =
+                            object3 (,,) ("identifier" := string) ("text" := string) ("counter" := int)
 
+                        parsedCardList =
+                            object3 (,,) ("identifier" := string) ("text" := string) ("cards" := (list parsedCard))
+                    in
+                        case (decodeString ("DATA" := (list parsedCardList)) message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok newList ->
+                                RESP_REFRESH (Debug.log "--->" newList)
 
                 _ ->
                     RESP_ERROR

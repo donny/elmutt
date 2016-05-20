@@ -29,7 +29,7 @@ update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
     case msg of
         Increment ->
-            ({ model | counter = model.counter + 1 }, Just (UpVote))
+            (model, Just (UpVote))
 
         StartEditingText ->
             ({ model | isEditingText = True }, Nothing)

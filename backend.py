@@ -112,17 +112,40 @@ class CardList(models.Model):
 def process_message(message):
     result = None
 
-    if message['REQ'] == 'NEWLIST':
+    if message['REQ'] == 'REFRESH':
+        raw_card_lists = CardList.objects.all()
+        all_card_lists = []
+        for raw_card_list in raw_card_lists:
+            card_list = {'text': raw_card_list.text, 'identifier': raw_card_list.identifier, 'cards': []}
+            for raw_card in raw_card_list.cards:
+                card_list['cards'].append({'text': raw_card.text, 'identifier': raw_card.identifier, 'counter': raw_card.counter})
+            all_card_lists.append(card_list)
+        result = {'RESP': 'REFRESH', 'DATA': all_card_lists}
+    elif message['REQ'] == 'NEWLIST':
         card_list = CardList(identifier=str(uuid.uuid4()), text="Untitled")
         card_list.save()
         result = {'RESP': 'NEWLIST', 'IDENTIFIER': card_list.identifier, 'TEXT': card_list.text}
     elif message['REQ'] == 'RENAMELIST':
-        result = {'RESP': 'RENAMELIST', 'IDENTIFIER': message['IDENTIFIER'], 'TEXT': message['TEXT']}
+        card_list = CardList.objects.filter(identifier=message['IDENTIFIER']).first()
+        card_list.text = message['TEXT']
+        card_list.save()
+        result = {'RESP': 'RENAMELIST', 'IDENTIFIER': card_list.identifier, 'TEXT': card_list.text}
     elif message['REQ'] == 'NEWCARD':
-        result = {'RESP': 'NEWCARD', 'IDENTIFIER': str(uuid.uuid4()), 'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'TEXT': 'TEMPCARD Untitled'}
+        card = Card(identifier=str(uuid.uuid4()), text="Untitled")
+        card.save()
+        card_list = CardList.objects.filter(identifier=message['LISTIDENTIFIER']).first()
+        card_list.cards.append(card)
+        card_list.save()
+        result = {'RESP': 'NEWCARD', 'IDENTIFIER': card.identifier, 'LISTIDENTIFIER': card_list.identifier, 'TEXT': card.text}
     elif message['REQ'] == 'RENAMECARD':
-        result = {'RESP': 'RENAMECARD', 'IDENTIFIER': message['IDENTIFIER'], 'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'TEXT': message['TEXT']}
+        card = Card.objects.filter(identifier=message['IDENTIFIER']).first()
+        card.text = message['TEXT']
+        card.save()
+        result = {'RESP': 'RENAMECARD', 'IDENTIFIER': card.identifier, 'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'TEXT': card.text}
     elif message['REQ'] == 'UPVOTECARD':
-        result = {'RESP': 'UPVOTECARD', 'IDENTIFIER': message['IDENTIFIER'], 'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'COUNTER': 9}
+        card = Card.objects.filter(identifier=message['IDENTIFIER']).first()
+        card.incr('counter')
+        card.save()
+        result = {'RESP': 'UPVOTECARD', 'IDENTIFIER': card.identifier, 'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'COUNTER': card.counter}
 
     return result
