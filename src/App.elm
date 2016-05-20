@@ -14,9 +14,9 @@ import Json.Decode exposing (..)
 -- APP
 
 
-main : Program Never
+main : Program (String)
 main =
-    Html.App.program { init = init, update = update, subscriptions = subscriptions, view = view }
+    Html.App.programWithFlags { init = init, update = update, subscriptions = subscriptions, view = view }
 
 
 
@@ -28,12 +28,12 @@ type alias ID =
 
 
 type alias Model =
-    { lists : List ( ID, CardList.Model ), isProcessing : Bool, isConnected : Bool }
+    { backend : String, lists : List ( ID, CardList.Model ), isProcessing : Bool, isConnected : Bool }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( { lists = [], isProcessing = False, isConnected = False }, Cmd.none )
+init : String -> ( Model, Cmd Msg )
+init backend =
+    ( { backend = (Debug.log "BackEnd: " backend), lists = [], isProcessing = False, isConnected = False }, Cmd.none )
 
 
 
@@ -180,7 +180,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    WebSocket.listen "ws://0.0.0.0:5000/receive" NetworkResponseDidReceive
+    WebSocket.listen (model.backend ++ "/receive") NetworkResponseDidReceive
 
 
 
@@ -248,41 +248,41 @@ networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
 networkRequestHandler req model =
     case Debug.log "DONNY RESP" req of
         REQ_CONNECT ->
-            ( { model | isConnected = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NOOP"}""" )
+            ( { model | isConnected = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NOOP"}""" )
 
         REQ_REFRESH ->
-            ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"REFRESH"}""" )
+            ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"REFRESH"}""" )
 
         REQ_NEWLIST ->
-            ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" """{"REQ":"NEWLIST"}""" )
+            ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NEWLIST"}""" )
 
         REQ_RENAMELIST identifier text ->
             let
                 requestString =
                     "{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
             in
-                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
 
         REQ_NEWCARD identifier ->
             let
                 requestString =
                     "{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}"
             in
-                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
 
         REQ_RENAMECARD listidentifier cardIdentifier text ->
             let
                 requestString =
                     "{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
             in
-                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
 
         REQ_UPVOTECARD listidentifier cardIdentifier ->
             let
                 requestString =
                     "{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}"
             in
-                ( { model | isProcessing = True }, WebSocket.send "ws://0.0.0.0:5000/submit" requestString )
+                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
 
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )

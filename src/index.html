@@ -18,8 +18,13 @@
     </div>
 
     <script type="text/javascript">
+        if (window.location.protocol == "https:") {
+            var backend = "wss://" + location.host;
+        } else {
+            var backend = "ws://" + location.host;
+        }
         var node = document.getElementById('main-app');
-        var app = Elm.App.embed(node);
+        var app = Elm.App.embed(node, backend);
     </script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
