@@ -60,11 +60,6 @@ view model =
                   else
                     button [ class "btn btn-secondary", onClick StartEditingText ]
                         [ i [ class "fa fa-pencil-square-o" ] [] ]
-                , button [ class "btn btn-secondary dropdown-toggle", attribute "data-toggle" "dropdown" ]
-                    [ i [ class "fa fa-trash-o" ] [] ]
-                , div [ class "dropdown-menu" ]
-                    [ a [ class "dropdown-item" ] [ text "Delete" ]
-                    ]
                 ]
             ]
         ]
