@@ -7585,6 +7585,26 @@ var _donny$ideaboard$CardList$view = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
+						model.isEditingText ? A2(
+						_elm_lang$html$Html$input,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$type$('text'),
+								_elm_lang$html$Html_Attributes$class('form-control'),
+								_elm_lang$html$Html_Events$onInput(_donny$ideaboard$CardList$TextChanged),
+								_elm_lang$html$Html_Attributes$value(model.text)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[])) : A2(
+						_elm_lang$html$Html$h1,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-brand')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(model.text)
+							])),
 						A2(
 						_elm_lang$html$Html$div,
 						_elm_lang$core$Native_List.fromArray(
@@ -7646,32 +7666,6 @@ var _donny$ideaboard$CardList$view = function (model) {
 										_elm_lang$core$Native_List.fromArray(
 											[]))
 									]))
-							])),
-						A2(
-						_elm_lang$html$Html$br,
-						_elm_lang$core$Native_List.fromArray(
-							[]),
-						_elm_lang$core$Native_List.fromArray(
-							[])),
-						model.isEditingText ? A2(
-						_elm_lang$html$Html$input,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$type$('text'),
-								_elm_lang$html$Html_Attributes$class('form-control'),
-								_elm_lang$html$Html_Events$onInput(_donny$ideaboard$CardList$TextChanged),
-								_elm_lang$html$Html_Attributes$value(model.text)
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[])) : A2(
-						_elm_lang$html$Html$h1,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-brand')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text(model.text)
 							]))
 					])),
 				A2(

@@ -126,7 +126,11 @@ view model =
     in
         div [ class "col-md-6" ]
             [ nav [ class "navbar navbar-light bg-faded" ]
-                [ div [ class "btn-group pull-right" ]
+                [ if model.isEditingText then
+                    input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
+                  else
+                    h1 [ class "navbar-brand" ] [ text model.text ]
+                , div [ class "btn-group pull-right" ]
                     [ if model.isEditingText then
                         button [ class "btn btn-secondary", onClick FinishEditingText ]
                             [ i [ class "fa fa-check-square-o" ] [] ]
@@ -135,11 +139,6 @@ view model =
                             [ i [ class "fa fa-pencil-square-o" ] [] ]
                     , button [ class "btn btn-secondary", onClick AskNewCard ] [ i [ class "fa fa-plus" ] [] ]
                     ]
-                , br [] []
-                , if model.isEditingText then
-                    input [ type' "text", class "form-control", onInput TextChanged, value model.text ] []
-                  else
-                    h1 [ class "navbar-brand" ] [ text model.text ]
                 ]
             , br [] []
             , cardViews
