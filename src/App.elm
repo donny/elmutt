@@ -43,12 +43,12 @@ init =
 type Msg
     = NoOp
     | Refresh (List ( String, String, List ( String, String, Int ) ))
-    | Insert String String
-    | Rename String String
-    | Modify ID CardList.Msg
-    | AddNewCard String String String
+    | InsertList String String
+    | RenameList String String
+    | InsertCard String String String
     | RenameCard String String String
-    | UpVoteCard String String Int
+    | UpvoteCard String String Int
+    | Modify ID CardList.Msg
     | SendNetworkRequest NetworkRequest
     | NetworkResponseDidReceive String
 
@@ -80,7 +80,7 @@ update msg model =
             in
                 ( { model | lists = lists }, Cmd.none )
 
-        Insert identifier text ->
+        InsertList identifier text ->
             let
                 newModel =
                     CardList.model
@@ -93,7 +93,17 @@ update msg model =
             in
                 ( { model | lists = newLists }, Cmd.none )
 
-        AddNewCard listidentifier identifier text ->
+        RenameList identifier text ->
+            let
+                updateCardList ( listID, listModel ) =
+                    if listID == identifier then
+                        ( listID, { listModel | text = text } )
+                    else
+                        ( listID, listModel )
+            in
+                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+
+        InsertCard listidentifier identifier text ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
@@ -113,21 +123,11 @@ update msg model =
             in
                 ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
 
-        UpVoteCard listidentifier identifier counter ->
+        UpvoteCard listidentifier identifier counter ->
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
                         ( listID, fst (CardList.update (CardList.UpvotingCard identifier counter) listModel) )
-                    else
-                        ( listID, listModel )
-            in
-                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
-
-        Rename identifier text ->
-            let
-                updateCardList ( listID, listModel ) =
-                    if listID == identifier then
-                        ( listID, { listModel | text = text } )
                     else
                         ( listID, listModel )
             in
@@ -295,19 +295,19 @@ networkResponseHandler resp model =
             update (Refresh newList) { model | isProcessing = False }
 
         RESP_NEWLIST identifier text ->
-            update (Insert identifier text) { model | isProcessing = False }
+            update (InsertList identifier text) { model | isProcessing = False }
 
         RESP_RENAMELIST identifier text ->
-            update (Rename identifier text) { model | isProcessing = False }
+            update (RenameList identifier text) { model | isProcessing = False }
 
         RESP_NEWCARD listidentifier identifier text ->
-            update (AddNewCard listidentifier identifier text) { model | isProcessing = False }
+            update (InsertCard listidentifier identifier text) { model | isProcessing = False }
 
         RESP_RENAMECARD listidentifier identifier text ->
             update (RenameCard listidentifier identifier text) { model | isProcessing = False }
 
         RESP_UPVOTECARD listidentifier identifier counter ->
-            update (UpVoteCard listidentifier identifier counter) { model | isProcessing = False }
+            update (UpvoteCard listidentifier identifier counter) { model | isProcessing = False }
 
 
 decodeNetworkResponse : String -> NetworkResponse
