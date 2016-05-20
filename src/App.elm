@@ -359,10 +359,10 @@ decodeNetworkResponse message =
 
                 "RESP_NEWCARD" ->
                     let
-                        parsedCardList =
+                        parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCardList message) of
+                        case (decodeString parsedCard message) of
                             Err error ->
                                 RESP_ERROR
 
@@ -371,10 +371,10 @@ decodeNetworkResponse message =
 
                 "RESP_RENAMECARD" ->
                     let
-                        parsedCardList =
+                        parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCardList message) of
+                        case (decodeString parsedCard message) of
                             Err error ->
                                 RESP_ERROR
 
@@ -383,10 +383,10 @@ decodeNetworkResponse message =
 
                 "RESP_UPVOTECARD" ->
                     let
-                        parsedCardList =
+                        parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("COUNTER" := int)
                     in
-                        case (decodeString parsedCardList message) of
+                        case (decodeString parsedCard message) of
                             Err error ->
                                 RESP_ERROR
 
