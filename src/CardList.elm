@@ -109,10 +109,10 @@ update msg model =
                     Nothing ->
                         ( newModel, Nothing )
 
-                    Just (Card.Rename newName) ->
+                    Just (Card.RequestRename newName) ->
                         ( newModel, Just (RenameCard id newName) )
 
-                    Just (Card.UpVote) ->
+                    Just (Card.RequestUpvote) ->
                         ( newModel, Just (UpVoteCard id) )
 
 

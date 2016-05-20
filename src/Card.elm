@@ -1,4 +1,4 @@
-module Card exposing (Model, Msg, Dispatch(Rename, UpVote), model, view, update)
+module Card exposing (Model, Msg, Dispatch(RequestRename, RequestUpvote), model, view, update)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type', disabled, readonly, attribute)
@@ -6,8 +6,8 @@ import Html.Events exposing (onInput, onClick)
 
 
 type Dispatch
-    = Rename String
-    | UpVote
+    = RequestRename String
+    | RequestUpvote
 
 
 type alias Model =
@@ -20,26 +20,26 @@ model =
 
 
 type Msg
-    = Increment
-    | StartEditingText
+    = StartEditingText
     | FinishEditingText
     | TextChanged String
+    | Upvote
 
 
 update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
     case msg of
-        Increment ->
-            ( model, Just (UpVote) )
-
         StartEditingText ->
             ( { model | isEditingText = True }, Nothing )
+
+        FinishEditingText ->
+            ( { model | isEditingText = False }, Just (RequestRename model.text) )
 
         TextChanged newText ->
             ( { model | text = newText }, Nothing )
 
-        FinishEditingText ->
-            ( { model | isEditingText = False }, Just (Rename model.text) )
+        Upvote ->
+            ( model, Just (RequestUpvote) )
 
 
 view : Model -> Html Msg
@@ -52,7 +52,7 @@ view model =
                 h5 [ class "card-title" ] [ text model.text ]
             , br [] []
             , div [ class "btn-group dropup btn-group-sm" ]
-                [ button [ class "btn btn-secondary", onClick Increment ]
+                [ button [ class "btn btn-secondary", onClick Upvote ]
                     [ text (toString model.counter ++ "  "), i [ class "fa fa-thumbs-o-up" ] [] ]
                 , if model.isEditingText then
                     button [ class "btn btn-secondary", onClick FinishEditingText ]
