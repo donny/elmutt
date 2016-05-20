@@ -1,0 +1,7 @@
+{
+  "name": "Elmutt",
+  "description": "A fresh clone of IdeaBoardz written in Elm",
+  "repository": "https://github.com/donny/elmutt",
+  "keywords": ["elm", "ideaboardz", "python"],
+  "addons": ["heroku-redis:hobby-dev"]
+}

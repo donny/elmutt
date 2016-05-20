@@ -2,7 +2,5 @@
 
 Elmütt is a fresh clone of [IdeaBoardz](http://www.ideaboardz.com) written in [Elm](http://elm-lang.org).
 
-```
-elm package install
-make
-```
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
