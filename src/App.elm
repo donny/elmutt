@@ -288,6 +288,12 @@ networkRequestHandler req model =
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
     case Debug.log "DONNY RESP" resp of
+        RESP_ERROR ->
+            update NoOp model
+
+        RESP_REFRESH newList ->
+            update (Refresh newList) { model | isProcessing = False }
+
         RESP_NEWLIST identifier text ->
             update (Insert identifier text) { model | isProcessing = False }
 
@@ -303,12 +309,6 @@ networkResponseHandler resp model =
         RESP_UPVOTECARD listidentifier identifier counter ->
             update (UpVoteCard listidentifier identifier counter) { model | isProcessing = False }
 
-        RESP_REFRESH newList ->
-            update (Refresh newList) { model | isProcessing = False }
-
-        RESP_ERROR ->
-            update NoOp model
-
 
 decodeNetworkResponse : String -> NetworkResponse
 decodeNetworkResponse message =
@@ -318,6 +318,21 @@ decodeNetworkResponse message =
 
         Ok value ->
             case value of
+                "RESP_REFRESH" ->
+                    let
+                        parsedCard =
+                            object3 (,,) ("identifier" := string) ("text" := string) ("counter" := int)
+
+                        parsedCardList =
+                            object3 (,,) ("identifier" := string) ("text" := string) ("cards" := (list parsedCard))
+                    in
+                        case (decodeString ("DATA" := (list parsedCardList)) message) of
+                            Err error ->
+                                RESP_ERROR
+
+                            Ok newList ->
+                                RESP_REFRESH (Debug.log "--->" newList)
+
                 "RESP_NEWLIST" ->
                     let
                         parsedCardList =
@@ -377,21 +392,6 @@ decodeNetworkResponse message =
 
                             Ok ( listidentifier, identifier, counter ) ->
                                 RESP_UPVOTECARD listidentifier identifier counter
-
-                "RESP_REFRESH" ->
-                    let
-                        parsedCard =
-                            object3 (,,) ("identifier" := string) ("text" := string) ("counter" := int)
-
-                        parsedCardList =
-                            object3 (,,) ("identifier" := string) ("text" := string) ("cards" := (list parsedCard))
-                    in
-                        case (decodeString ("DATA" := (list parsedCardList)) message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok newList ->
-                                RESP_REFRESH (Debug.log "--->" newList)
 
                 _ ->
                     RESP_ERROR
