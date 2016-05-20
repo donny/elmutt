@@ -4,3 +4,5 @@ Elmütt is a fresh clone of [IdeaBoardz](http://www.ideaboardz.com) written in [
 
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+![Screenshot](https://raw.githubusercontent.com/donny/elmutt/master/screenshot.png)
