@@ -74,7 +74,6 @@ update msg model =
             in
                 ( { model | cards = List.map updateCard model.cards }, Nothing )
 
-
         Insert identifier text ->
             let
                 newModel =

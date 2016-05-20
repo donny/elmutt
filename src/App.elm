@@ -42,7 +42,7 @@ init =
 
 type Msg
     = NoOp
-    | Refresh (List ( String, String, List (String, String, Int) ))
+    | Refresh (List ( String, String, List ( String, String, Int ) ))
     | Insert String String
     | Rename String String
     | Modify ID CardList.Msg
@@ -61,13 +61,12 @@ update msg model =
 
         Refresh newlist ->
             let
-
-                updateCard (cardID, cardText, cardCounter) =
-                  let
-                    newCard = Card.model
-                  in
-                    (cardID, { newCard | text = cardText, counter = cardCounter})
-
+                updateCard ( cardID, cardText, cardCounter ) =
+                    let
+                        newCard =
+                            Card.model
+                    in
+                        ( cardID, { newCard | text = cardText, counter = cardCounter } )
 
                 updateCardList ( listID, listText, listCards ) =
                     let
@@ -237,7 +236,7 @@ type NetworkRequest
 
 type NetworkResponse
     = RESP_ERROR
-    | RESP_REFRESH (List ( String, String, List (String, String, Int) ))
+    | RESP_REFRESH (List ( String, String, List ( String, String, Int ) ))
     | RESP_NEWLIST String String
     | RESP_RENAMELIST String String
     | RESP_NEWCARD String String String
@@ -319,7 +318,7 @@ decodeNetworkResponse message =
 
         Ok value ->
             case value of
-                "NEWLIST" ->
+                "RESP_NEWLIST" ->
                     let
                         parsedCardList =
                             object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
@@ -331,7 +330,7 @@ decodeNetworkResponse message =
                             Ok ( identifier, text ) ->
                                 RESP_NEWLIST identifier text
 
-                "RENAMELIST" ->
+                "RESP_RENAMELIST" ->
                     let
                         parsedCardList =
                             object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
@@ -343,7 +342,7 @@ decodeNetworkResponse message =
                             Ok ( identifier, text ) ->
                                 RESP_RENAMELIST identifier text
 
-                "NEWCARD" ->
+                "RESP_NEWCARD" ->
                     let
                         parsedCardList =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
@@ -355,7 +354,7 @@ decodeNetworkResponse message =
                             Ok ( listidentifier, identifier, text ) ->
                                 RESP_NEWCARD listidentifier identifier text
 
-                "RENAMECARD" ->
+                "RESP_RENAMECARD" ->
                     let
                         parsedCardList =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
@@ -367,7 +366,7 @@ decodeNetworkResponse message =
                             Ok ( listidentifier, identifier, text ) ->
                                 RESP_RENAMECARD listidentifier identifier text
 
-                "UPVOTECARD" ->
+                "RESP_UPVOTECARD" ->
                     let
                         parsedCardList =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("COUNTER" := int)
@@ -379,7 +378,7 @@ decodeNetworkResponse message =
                             Ok ( listidentifier, identifier, counter ) ->
                                 RESP_UPVOTECARD listidentifier identifier counter
 
-                "REFRESH" ->
+                "RESP_REFRESH" ->
                     let
                         parsedCard =
                             object3 (,,) ("identifier" := string) ("text" := string) ("counter" := int)

@@ -9,6 +9,7 @@ type Dispatch
     = Rename String
     | UpVote
 
+
 type alias Model =
     { counter : Int, text : String, isEditingText : Bool }
 
@@ -29,13 +30,13 @@ update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
     case msg of
         Increment ->
-            (model, Just (UpVote))
+            ( model, Just (UpVote) )
 
         StartEditingText ->
-            ({ model | isEditingText = True }, Nothing)
+            ( { model | isEditingText = True }, Nothing )
 
         TextChanged newText ->
-            ({ model | text = newText }, Nothing)
+            ( { model | text = newText }, Nothing )
 
         FinishEditingText ->
             ( { model | isEditingText = False }, Just (Rename model.text) )
