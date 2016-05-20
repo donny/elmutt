@@ -1,15 +1,15 @@
 .PHONY: clean
 
 ELM_FILES = $(shell find src -type f -name '*.elm')
-COMPILE_TARGETS = build/app.js \
-									build/index.html
+COMPILE_TARGETS = static/app.js \
+									templates/index.html
 
 all: $(COMPILE_TARGETS)
 
-build/app.js: $(ELM_FILES)
+static/app.js: $(ELM_FILES)
 	elm make $(ELM_FILES) --yes --warn --output $@
 
-build/index.html: src/index.html
+templates/index.html: src/index.html
 	cp $? $@
 
 clean:
