@@ -6,7 +6,6 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.App
 import Html.Events exposing (onClick)
-import Debug
 import WebSocket
 import Json.Decode exposing (..)
 
@@ -33,7 +32,7 @@ type alias Model =
 
 init : String -> ( Model, Cmd Msg )
 init backend =
-    ( { backend = (Debug.log "BackEnd: " backend), lists = [], isProcessing = False, isConnected = False }, Cmd.none )
+    ( { backend = backend, lists = [], isProcessing = False, isConnected = False }, Cmd.none )
 
 
 
@@ -55,7 +54,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "App Update " msg of
+    case msg of
         NoOp ->
             ( model, Cmd.none )
 
@@ -246,7 +245,7 @@ type NetworkResponse
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
 networkRequestHandler req model =
-    case Debug.log "DONNY RESP" req of
+    case req of
         REQ_CONNECT ->
             ( { model | isConnected = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NOOP"}""" )
 
@@ -287,7 +286,7 @@ networkRequestHandler req model =
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
-    case Debug.log "DONNY RESP" resp of
+    case resp of
         RESP_ERROR ->
             update NoOp model
 
@@ -312,7 +311,7 @@ networkResponseHandler resp model =
 
 decodeNetworkResponse : String -> NetworkResponse
 decodeNetworkResponse message =
-    case Debug.log "decodeNetworkResponse: " (decodeString ("RESP" := string) (Debug.log "rawMessage: " message)) of
+    case (decodeString ("RESP" := string) message) of
         Err error ->
             RESP_ERROR
 
@@ -331,7 +330,7 @@ decodeNetworkResponse message =
                                 RESP_ERROR
 
                             Ok newList ->
-                                RESP_REFRESH (Debug.log "--->" newList)
+                                RESP_REFRESH newList
 
                 "RESP_NEWLIST" ->
                     let

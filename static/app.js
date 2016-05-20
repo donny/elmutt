@@ -7418,7 +7418,7 @@ var _donny$ideaboard$CardList$RequestRename = function (a) {
 };
 var _donny$ideaboard$CardList$update = F2(
 	function (msg, model) {
-		var _p0 = A2(_elm_lang$core$Debug$log, 'CardList Update ', msg);
+		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'StartEditingText':
 				return {
@@ -8671,7 +8671,7 @@ _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/web
 
 var _donny$ideaboard$App$networkRequestHandler = F2(
 	function (req, model) {
-		var _p0 = A2(_elm_lang$core$Debug$log, 'DONNY RESP', req);
+		var _p0 = req;
 		switch (_p0.ctor) {
 			case 'REQ_CONNECT':
 				return {
@@ -8796,7 +8796,7 @@ var _donny$ideaboard$App$init = function (backend) {
 	return {
 		ctor: '_Tuple2',
 		_0: {
-			backend: A2(_elm_lang$core$Debug$log, 'BackEnd: ', backend),
+			backend: backend,
 			lists: _elm_lang$core$Native_List.fromArray(
 				[]),
 			isProcessing: false,
@@ -9021,12 +9021,9 @@ var _donny$ideaboard$App$RESP_REFRESH = function (a) {
 var _donny$ideaboard$App$RESP_ERROR = {ctor: 'RESP_ERROR'};
 var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 	var _p3 = A2(
-		_elm_lang$core$Debug$log,
-		'decodeNetworkResponse: ',
-		A2(
-			_elm_lang$core$Json_Decode$decodeString,
-			A2(_elm_lang$core$Json_Decode_ops[':='], 'RESP', _elm_lang$core$Json_Decode$string),
-			A2(_elm_lang$core$Debug$log, 'rawMessage: ', message)));
+		_elm_lang$core$Json_Decode$decodeString,
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'RESP', _elm_lang$core$Json_Decode$string),
+		message);
 	if (_p3.ctor === 'Err') {
 		return _donny$ideaboard$App$RESP_ERROR;
 	} else {
@@ -9064,8 +9061,7 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 				if (_p5.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return _donny$ideaboard$App$RESP_REFRESH(
-						A2(_elm_lang$core$Debug$log, '--->', _p5._0));
+					return _donny$ideaboard$App$RESP_REFRESH(_p5._0);
 				}
 			case 'RESP_NEWLIST':
 				var parsedCardList = A3(
@@ -9152,7 +9148,7 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 };
 var _donny$ideaboard$App$update = F2(
 	function (msg, model) {
-		var _p11 = A2(_elm_lang$core$Debug$log, 'App Update ', msg);
+		var _p11 = msg;
 		switch (_p11.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -9374,7 +9370,7 @@ var _donny$ideaboard$App$update = F2(
 	});
 var _donny$ideaboard$App$networkResponseHandler = F2(
 	function (resp, model) {
-		var _p40 = A2(_elm_lang$core$Debug$log, 'DONNY RESP', resp);
+		var _p40 = resp;
 		switch (_p40.ctor) {
 			case 'RESP_ERROR':
 				return A2(_donny$ideaboard$App$update, _donny$ideaboard$App$NoOp, model);

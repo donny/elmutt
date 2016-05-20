@@ -5,7 +5,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.App exposing (map)
 import Html.Events exposing (onInput, onClick)
-import Debug
 
 
 type Dispatch
@@ -41,7 +40,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Maybe Dispatch )
 update msg model =
-    case Debug.log "CardList Update " msg of
+    case msg of
         StartEditingText ->
             ( { model | isEditingText = True }, Nothing )
 
