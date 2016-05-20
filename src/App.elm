@@ -97,7 +97,7 @@ update msg model =
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.Insert identifier text) listModel) )
+                        ( listID, fst (CardList.update (CardList.InsertingCard identifier text) listModel) )
                     else
                         ( listID, listModel )
             in
@@ -107,7 +107,7 @@ update msg model =
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.RenameCurrentCard identifier text) listModel) )
+                        ( listID, fst (CardList.update (CardList.RenamingCard identifier text) listModel) )
                     else
                         ( listID, listModel )
             in
@@ -117,7 +117,7 @@ update msg model =
             let
                 updateCardList ( listID, listModel ) =
                     if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.UpVoteCurrentCard identifier counter) listModel) )
+                        ( listID, fst (CardList.update (CardList.UpvotingCard identifier counter) listModel) )
                     else
                         ( listID, listModel )
             in
@@ -155,16 +155,16 @@ update msg model =
                     Nothing ->
                         ( newModel, Cmd.none )
 
-                    Just (CardList.Rename newName) ->
+                    Just (CardList.RequestRename newName) ->
                         networkRequestHandler (REQ_RENAMELIST id newName) newModel
 
-                    Just (CardList.NewCard) ->
+                    Just (CardList.RequestNewCard) ->
                         networkRequestHandler (REQ_NEWCARD id) newModel
 
-                    Just (CardList.RenameCard cardIdentifier newName) ->
+                    Just (CardList.RequestRenameCard cardIdentifier newName) ->
                         networkRequestHandler (REQ_RENAMECARD id cardIdentifier newName) newModel
 
-                    Just (CardList.UpVoteCard cardIdentifier) ->
+                    Just (CardList.RequestUpvoteCard cardIdentifier) ->
                         networkRequestHandler (REQ_UPVOTECARD id cardIdentifier) newModel
 
         SendNetworkRequest req ->

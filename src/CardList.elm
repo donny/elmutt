@@ -1,4 +1,4 @@
-module CardList exposing (Model, Msg(Insert, RenameCurrentCard, UpVoteCurrentCard), Dispatch(Rename, NewCard, RenameCard, UpVoteCard), model, view, update)
+module CardList exposing (Model, Msg(InsertingCard, RenamingCard, UpvotingCard), Dispatch(RequestRename, RequestNewCard, RequestRenameCard, RequestUpvoteCard), model, view, update)
 
 import Card
 import Html exposing (..)
@@ -9,10 +9,10 @@ import Debug
 
 
 type Dispatch
-    = Rename String
-    | NewCard
-    | RenameCard String String
-    | UpVoteCard String
+    = RequestRename String
+    | RequestNewCard
+    | RequestRenameCard String String
+    | RequestUpvoteCard String
 
 
 type alias ID =
@@ -32,10 +32,10 @@ type Msg
     = StartEditingText
     | FinishEditingText
     | TextChanged String
-    | Insert String String
-    | InsertNewCard
-    | RenameCurrentCard String String
-    | UpVoteCurrentCard String Int
+    | AskNewCard
+    | InsertingCard String String
+    | RenamingCard String String
+    | UpvotingCard String Int
     | Modify ID Card.Msg
 
 
@@ -45,36 +45,16 @@ update msg model =
         StartEditingText ->
             ( { model | isEditingText = True }, Nothing )
 
+        FinishEditingText ->
+            ( { model | isEditingText = False }, Just (RequestRename model.text) )
+
         TextChanged newText ->
             ( { model | text = newText }, Nothing )
 
-        FinishEditingText ->
-            ( { model | isEditingText = False }, Just (Rename model.text) )
+        AskNewCard ->
+            ( model, Just (RequestNewCard) )
 
-        InsertNewCard ->
-            ( model, Just (NewCard) )
-
-        RenameCurrentCard identifier text ->
-            let
-                updateCard ( cardID, cardModel ) =
-                    if cardID == identifier then
-                        ( cardID, { cardModel | text = text } )
-                    else
-                        ( cardID, cardModel )
-            in
-                ( { model | cards = List.map updateCard model.cards }, Nothing )
-
-        UpVoteCurrentCard identifier counter ->
-            let
-                updateCard ( cardID, cardModel ) =
-                    if cardID == identifier then
-                        ( cardID, { cardModel | counter = counter } )
-                    else
-                        ( cardID, cardModel )
-            in
-                ( { model | cards = List.map updateCard model.cards }, Nothing )
-
-        Insert identifier text ->
+        InsertingCard identifier text ->
             let
                 newModel =
                     Card.model
@@ -86,6 +66,26 @@ update msg model =
                     model.cards ++ [ newCard ]
             in
                 ( { model | cards = newCards }, Nothing )
+
+        RenamingCard identifier text ->
+            let
+                updateCard ( cardID, cardModel ) =
+                    if cardID == identifier then
+                        ( cardID, { cardModel | text = text } )
+                    else
+                        ( cardID, cardModel )
+            in
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
+
+        UpvotingCard identifier counter ->
+            let
+                updateCard ( cardID, cardModel ) =
+                    if cardID == identifier then
+                        ( cardID, { cardModel | counter = counter } )
+                    else
+                        ( cardID, cardModel )
+            in
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
 
         Modify id cardMsg ->
             let
@@ -110,10 +110,10 @@ update msg model =
                         ( newModel, Nothing )
 
                     Just (Card.RequestRename newName) ->
-                        ( newModel, Just (RenameCard id newName) )
+                        ( newModel, Just (RequestRenameCard id newName) )
 
                     Just (Card.RequestUpvote) ->
-                        ( newModel, Just (UpVoteCard id) )
+                        ( newModel, Just (RequestUpvoteCard id) )
 
 
 view : Model -> Html Msg
@@ -138,7 +138,7 @@ view model =
                       else
                         button [ class "btn btn-secondary", onClick StartEditingText ]
                             [ i [ class "fa fa-pencil-square-o" ] [] ]
-                    , button [ class "btn btn-secondary", onClick InsertNewCard ] [ i [ class "fa fa-plus" ] [] ]
+                    , button [ class "btn btn-secondary", onClick AskNewCard ] [ i [ class "fa fa-plus" ] [] ]
                     ]
                 ]
             , br [] []
