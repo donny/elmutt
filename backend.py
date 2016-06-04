@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# Based on https://devcenter.heroku.com/articles/python-websockets
+
 import os
 import logging
 import redis
@@ -123,19 +125,25 @@ def process_message(message):
                 card_list['cards'].append(
                     {'text': raw_card.text, 'identifier': raw_card.identifier, 'counter': raw_card.counter})
             all_card_lists.append(card_list)
-        result = {'RESP': 'RESP_REFRESH', 'DATA': all_card_lists}
+        result = {'RESP': 'RESP_REFRESH',
+                  'DATA': all_card_lists}
+
     elif message['REQ'] == 'NEWLIST':
         card_list = CardList(identifier=str(uuid.uuid4()), text="Untitled")
         card_list.save()
         result = {'RESP': 'RESP_NEWLIST',
-                  'IDENTIFIER': card_list.identifier, 'TEXT': card_list.text}
+                  'IDENTIFIER': card_list.identifier,
+                  'TEXT': card_list.text}
+
     elif message['REQ'] == 'RENAMELIST':
         card_list = CardList.objects.filter(
             identifier=message['IDENTIFIER']).first()
         card_list.text = message['TEXT']
         card_list.save()
         result = {'RESP': 'RESP_RENAMELIST',
-                  'IDENTIFIER': card_list.identifier, 'TEXT': card_list.text}
+                  'IDENTIFIER': card_list.identifier,
+                  'TEXT': card_list.text}
+
     elif message['REQ'] == 'NEWCARD':
         card = Card(identifier=str(uuid.uuid4()), text="Untitled")
         card.save()
@@ -143,19 +151,27 @@ def process_message(message):
             identifier=message['LISTIDENTIFIER']).first()
         card_list.cards.append(card)
         card_list.save()
-        result = {'RESP': 'RESP_NEWCARD', 'IDENTIFIER': card.identifier,
-                  'LISTIDENTIFIER': card_list.identifier, 'TEXT': card.text}
+        result = {'RESP': 'RESP_NEWCARD',
+                  'IDENTIFIER': card.identifier,
+                  'LISTIDENTIFIER': card_list.identifier,
+                  'TEXT': card.text}
+
     elif message['REQ'] == 'RENAMECARD':
         card = Card.objects.filter(identifier=message['IDENTIFIER']).first()
         card.text = message['TEXT']
         card.save()
-        result = {'RESP': 'RESP_RENAMECARD', 'IDENTIFIER': card.identifier,
-                  'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'TEXT': card.text}
+        result = {'RESP': 'RESP_RENAMECARD',
+                  'IDENTIFIER': card.identifier,
+                  'LISTIDENTIFIER': message['LISTIDENTIFIER'],
+                  'TEXT': card.text}
+
     elif message['REQ'] == 'UPVOTECARD':
         card = Card.objects.filter(identifier=message['IDENTIFIER']).first()
         card.incr('counter')
         card.save()
-        result = {'RESP': 'RESP_UPVOTECARD', 'IDENTIFIER': card.identifier,
-                  'LISTIDENTIFIER': message['LISTIDENTIFIER'], 'COUNTER': card.counter}
+        result = {'RESP': 'RESP_UPVOTECARD',
+                  'IDENTIFIER': card.identifier,
+                  'LISTIDENTIFIER': message['LISTIDENTIFIER'],
+                  'COUNTER': card.counter}
 
     return result
