@@ -245,43 +245,31 @@ type NetworkResponse
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
 networkRequestHandler req model =
-    case req of
-        REQ_CONNECT ->
-            ( { model | isConnected = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NOOP"}""" )
+    let
+        sendRequest model requestString =
+            ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
+    in
+        case req of
+            REQ_CONNECT ->
+                ( { model | isConnected = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NOOP"}""" )
 
-        REQ_REFRESH ->
-            ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"REFRESH"}""" )
+            REQ_REFRESH ->
+                sendRequest model """{"REQ":"REFRESH"}"""
 
-        REQ_NEWLIST ->
-            ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NEWLIST"}""" )
+            REQ_NEWLIST ->
+                sendRequest model """{"REQ":"NEWLIST"}"""
 
-        REQ_RENAMELIST identifier text ->
-            let
-                requestString =
-                    "{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
-            in
-                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
+            REQ_RENAMELIST identifier text ->
+                sendRequest model ("{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
 
-        REQ_NEWCARD identifier ->
-            let
-                requestString =
-                    "{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}"
-            in
-                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
+            REQ_NEWCARD identifier ->
+                sendRequest model ("{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}")
 
-        REQ_RENAMECARD listidentifier cardIdentifier text ->
-            let
-                requestString =
-                    "{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}"
-            in
-                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
+            REQ_RENAMECARD listidentifier cardIdentifier text ->
+                sendRequest model ("{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
 
-        REQ_UPVOTECARD listidentifier cardIdentifier ->
-            let
-                requestString =
-                    "{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}"
-            in
-                ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
+            REQ_UPVOTECARD listidentifier cardIdentifier ->
+                sendRequest model ("{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}")
 
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )

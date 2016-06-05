@@ -8634,6 +8634,19 @@ _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/web
 
 var _donny$ideaboard$App$networkRequestHandler = F2(
 	function (req, model) {
+		var sendRequest = F2(
+			function (model, requestString) {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{isProcessing: true}),
+					_1: A2(
+						_elm_lang$websocket$WebSocket$send,
+						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
+						requestString)
+				};
+			});
 		var _p0 = req;
 		switch (_p0.ctor) {
 			case 'REQ_CONNECT':
@@ -8648,111 +8661,65 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 						'{\"REQ\":\"NOOP\"}')
 				};
 			case 'REQ_REFRESH':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						'{\"REQ\":\"REFRESH\"}')
-				};
+				return A2(sendRequest, model, '{\"REQ\":\"REFRESH\"}');
 			case 'REQ_NEWLIST':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						'{\"REQ\":\"NEWLIST\"}')
-				};
+				return A2(sendRequest, model, '{\"REQ\":\"NEWLIST\"}');
 			case 'REQ_RENAMELIST':
-				var requestString = A2(
-					_elm_lang$core$Basics_ops['++'],
-					'{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"',
+				return A2(
+					sendRequest,
+					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						_p0._0,
+						'{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							'\", \"TEXT\":\"',
-							A2(_elm_lang$core$Basics_ops['++'], _p0._1, '\"}'))));
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						requestString)
-				};
-			case 'REQ_NEWCARD':
-				var requestString = A2(
-					_elm_lang$core$Basics_ops['++'],
-					'{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"',
-					A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}'));
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						requestString)
-				};
-			case 'REQ_RENAMECARD':
-				var requestString = A2(
-					_elm_lang$core$Basics_ops['++'],
-					'{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_p0._1,
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'\", \"LISTIDENTIFIER\":\"',
+							_p0._0,
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								_p0._0,
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'\", \"TEXT\":\"',
-									A2(_elm_lang$core$Basics_ops['++'], _p0._2, '\"}'))))));
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						requestString)
-				};
-			default:
-				var requestString = A2(
-					_elm_lang$core$Basics_ops['++'],
-					'{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"',
+								'\", \"TEXT\":\"',
+								A2(_elm_lang$core$Basics_ops['++'], _p0._1, '\"}')))));
+			case 'REQ_NEWCARD':
+				return A2(
+					sendRequest,
+					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						_p0._1,
+						'{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"',
+						A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}')));
+			case 'REQ_RENAMECARD':
+				return A2(
+					sendRequest,
+					model,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							'\", \"LISTIDENTIFIER\":\"',
-							A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}'))));
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: true}),
-					_1: A2(
-						_elm_lang$websocket$WebSocket$send,
-						A2(_elm_lang$core$Basics_ops['++'], model.backend, '/submit'),
-						requestString)
-				};
+							_p0._1,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\", \"LISTIDENTIFIER\":\"',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_p0._0,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'\", \"TEXT\":\"',
+										A2(_elm_lang$core$Basics_ops['++'], _p0._2, '\"}')))))));
+			default:
+				return A2(
+					sendRequest,
+					model,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p0._1,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\", \"LISTIDENTIFIER\":\"',
+								A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}')))));
 		}
 	});
 var _donny$ideaboard$App$updateItem = F3(
