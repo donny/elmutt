@@ -8755,6 +8755,22 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 				};
 		}
 	});
+var _donny$ideaboard$App$updateItem = F3(
+	function (identifier, list, update) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (_p1) {
+				var _p2 = _p1;
+				var _p4 = _p2._1;
+				var _p3 = _p2._0;
+				return _elm_lang$core$Native_Utils.eq(identifier, _p3) ? {
+					ctor: '_Tuple2',
+					_0: _p3,
+					_1: update(_p4)
+				} : {ctor: '_Tuple2', _0: _p3, _1: _p4};
+			},
+			list);
+	});
 var _donny$ideaboard$App$init = function (backend) {
 	return {
 		ctor: '_Tuple2',
@@ -8831,14 +8847,14 @@ var _donny$ideaboard$App$REQ_NEWLIST = {ctor: 'REQ_NEWLIST'};
 var _donny$ideaboard$App$REQ_REFRESH = {ctor: 'REQ_REFRESH'};
 var _donny$ideaboard$App$REQ_CONNECT = {ctor: 'REQ_CONNECT'};
 var _donny$ideaboard$App$view = function (model) {
-	var cardListView = function (_p1) {
-		var _p2 = _p1;
+	var cardListView = function (_p5) {
+		var _p6 = _p5;
 		return A2(
 			_elm_lang$html$Html_App$map,
 			function (model) {
-				return A2(_donny$ideaboard$App$Modify, _p2._0, model);
+				return A2(_donny$ideaboard$App$Modify, _p6._0, model);
 			},
-			_donny$ideaboard$CardList$view(_p2._1));
+			_donny$ideaboard$CardList$view(_p6._1));
 	};
 	var cardListViews = A2(
 		_elm_lang$html$Html$div,
@@ -8983,15 +8999,15 @@ var _donny$ideaboard$App$RESP_REFRESH = function (a) {
 };
 var _donny$ideaboard$App$RESP_ERROR = {ctor: 'RESP_ERROR'};
 var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
-	var _p3 = A2(
+	var _p7 = A2(
 		_elm_lang$core$Json_Decode$decodeString,
 		A2(_elm_lang$core$Json_Decode_ops[':='], 'RESP', _elm_lang$core$Json_Decode$string),
 		message);
-	if (_p3.ctor === 'Err') {
+	if (_p7.ctor === 'Err') {
 		return _donny$ideaboard$App$RESP_ERROR;
 	} else {
-		var _p4 = _p3._0;
-		switch (_p4) {
+		var _p8 = _p7._0;
+		switch (_p8) {
 			case 'RESP_REFRESH':
 				var parsedCard = A4(
 					_elm_lang$core$Json_Decode$object3,
@@ -9014,17 +9030,17 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 						_elm_lang$core$Json_Decode_ops[':='],
 						'cards',
 						_elm_lang$core$Json_Decode$list(parsedCard)));
-				var _p5 = A2(
+				var _p9 = A2(
 					_elm_lang$core$Json_Decode$decodeString,
 					A2(
 						_elm_lang$core$Json_Decode_ops[':='],
 						'DATA',
 						_elm_lang$core$Json_Decode$list(parsedCardList)),
 					message);
-				if (_p5.ctor === 'Err') {
+				if (_p9.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return _donny$ideaboard$App$RESP_REFRESH(_p5._0);
+					return _donny$ideaboard$App$RESP_REFRESH(_p9._0);
 				}
 			case 'RESP_NEWLIST':
 				var parsedCardList = A3(
@@ -9035,11 +9051,11 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 						}),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'TEXT', _elm_lang$core$Json_Decode$string));
-				var _p6 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCardList, message);
-				if (_p6.ctor === 'Err') {
+				var _p10 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCardList, message);
+				if (_p10.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return A2(_donny$ideaboard$App$RESP_NEWLIST, _p6._0._0, _p6._0._1);
+					return A2(_donny$ideaboard$App$RESP_NEWLIST, _p10._0._0, _p10._0._1);
 				}
 			case 'RESP_RENAMELIST':
 				var parsedCardList = A3(
@@ -9050,11 +9066,11 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 						}),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'TEXT', _elm_lang$core$Json_Decode$string));
-				var _p7 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCardList, message);
-				if (_p7.ctor === 'Err') {
+				var _p11 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCardList, message);
+				if (_p11.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return A2(_donny$ideaboard$App$RESP_RENAMELIST, _p7._0._0, _p7._0._1);
+					return A2(_donny$ideaboard$App$RESP_RENAMELIST, _p11._0._0, _p11._0._1);
 				}
 			case 'RESP_NEWCARD':
 				var parsedCard = A4(
@@ -9066,11 +9082,11 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'LISTIDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'TEXT', _elm_lang$core$Json_Decode$string));
-				var _p8 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
-				if (_p8.ctor === 'Err') {
+				var _p12 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
+				if (_p12.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return A3(_donny$ideaboard$App$RESP_NEWCARD, _p8._0._0, _p8._0._1, _p8._0._2);
+					return A3(_donny$ideaboard$App$RESP_NEWCARD, _p12._0._0, _p12._0._1, _p12._0._2);
 				}
 			case 'RESP_RENAMECARD':
 				var parsedCard = A4(
@@ -9082,11 +9098,11 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'LISTIDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'TEXT', _elm_lang$core$Json_Decode$string));
-				var _p9 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
-				if (_p9.ctor === 'Err') {
+				var _p13 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
+				if (_p13.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return A3(_donny$ideaboard$App$RESP_RENAMECARD, _p9._0._0, _p9._0._1, _p9._0._2);
+					return A3(_donny$ideaboard$App$RESP_RENAMECARD, _p13._0._0, _p13._0._1, _p13._0._2);
 				}
 			case 'RESP_UPVOTECARD':
 				var parsedCard = A4(
@@ -9098,11 +9114,11 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'LISTIDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string),
 					A2(_elm_lang$core$Json_Decode_ops[':='], 'COUNTER', _elm_lang$core$Json_Decode$int));
-				var _p10 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
-				if (_p10.ctor === 'Err') {
+				var _p14 = A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message);
+				if (_p14.ctor === 'Err') {
 					return _donny$ideaboard$App$RESP_ERROR;
 				} else {
-					return A3(_donny$ideaboard$App$RESP_UPVOTECARD, _p10._0._0, _p10._0._1, _p10._0._2);
+					return A3(_donny$ideaboard$App$RESP_UPVOTECARD, _p14._0._0, _p14._0._1, _p14._0._2);
 				}
 			default:
 				return _donny$ideaboard$App$RESP_ERROR;
@@ -9111,37 +9127,37 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 };
 var _donny$ideaboard$App$update = F2(
 	function (msg, model) {
-		var _p11 = msg;
-		switch (_p11.ctor) {
+		var _p15 = msg;
+		switch (_p15.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Refresh':
-				var updateCard = function (_p12) {
-					var _p13 = _p12;
+				var updateCard = function (_p16) {
+					var _p17 = _p16;
 					var newCard = _donny$ideaboard$Card$model;
 					return {
 						ctor: '_Tuple2',
-						_0: _p13._0,
+						_0: _p17._0,
 						_1: _elm_lang$core$Native_Utils.update(
 							newCard,
-							{text: _p13._1, counter: _p13._2})
+							{text: _p17._1, counter: _p17._2})
 					};
 				};
-				var updateCardList = function (_p14) {
-					var _p15 = _p14;
+				var updateCardList = function (_p18) {
+					var _p19 = _p18;
 					var newCardList = _donny$ideaboard$CardList$model;
 					return {
 						ctor: '_Tuple2',
-						_0: _p15._0,
+						_0: _p19._0,
 						_1: _elm_lang$core$Native_Utils.update(
 							newCardList,
 							{
-								text: _p15._1,
-								cards: A2(_elm_lang$core$List$map, updateCard, _p15._2)
+								text: _p19._1,
+								cards: A2(_elm_lang$core$List$map, updateCard, _p19._2)
 							})
 					};
 				};
-				var lists = A2(_elm_lang$core$List$map, updateCardList, _p11._0);
+				var lists = A2(_elm_lang$core$List$map, updateCardList, _p15._0);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -9153,10 +9169,10 @@ var _donny$ideaboard$App$update = F2(
 				var newModel = _donny$ideaboard$CardList$model;
 				var newList = {
 					ctor: '_Tuple2',
-					_0: _p11._0,
+					_0: _p15._0,
 					_1: _elm_lang$core$Native_Utils.update(
 						newModel,
-						{text: _p11._1})
+						{text: _p15._1})
 				};
 				var newLists = A2(
 					_elm_lang$core$Basics_ops['++'],
@@ -9171,211 +9187,191 @@ var _donny$ideaboard$App$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'RenameList':
-				var updateCardList = function (_p16) {
-					var _p17 = _p16;
-					var _p19 = _p17._1;
-					var _p18 = _p17._0;
-					return _elm_lang$core$Native_Utils.eq(_p18, _p11._0) ? {
-						ctor: '_Tuple2',
-						_0: _p18,
-						_1: _elm_lang$core$Native_Utils.update(
-							_p19,
-							{text: _p11._1})
-					} : {ctor: '_Tuple2', _0: _p18, _1: _p19};
-				};
+				var newLists = A3(
+					_donny$ideaboard$App$updateItem,
+					_p15._0,
+					model.lists,
+					function (item) {
+						return _elm_lang$core$Native_Utils.update(
+							item,
+							{text: _p15._1});
+					});
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							lists: A2(_elm_lang$core$List$map, updateCardList, model.lists)
-						}),
+						{lists: newLists}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'InsertCard':
-				var updateCardList = function (_p20) {
-					var _p21 = _p20;
-					var _p23 = _p21._1;
-					var _p22 = _p21._0;
-					return _elm_lang$core$Native_Utils.eq(_p22, _p11._0) ? {
-						ctor: '_Tuple2',
-						_0: _p22,
-						_1: _elm_lang$core$Basics$fst(
+				var newLists = A3(
+					_donny$ideaboard$App$updateItem,
+					_p15._0,
+					model.lists,
+					function (item) {
+						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$InsertingCard, _p11._1, _p11._2),
-								_p23))
-					} : {ctor: '_Tuple2', _0: _p22, _1: _p23};
-				};
+								A2(_donny$ideaboard$CardList$InsertingCard, _p15._1, _p15._2),
+								item));
+					});
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							lists: A2(_elm_lang$core$List$map, updateCardList, model.lists)
-						}),
+						{lists: newLists}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'RenameCard':
-				var updateCardList = function (_p24) {
-					var _p25 = _p24;
-					var _p27 = _p25._1;
-					var _p26 = _p25._0;
-					return _elm_lang$core$Native_Utils.eq(_p26, _p11._0) ? {
-						ctor: '_Tuple2',
-						_0: _p26,
-						_1: _elm_lang$core$Basics$fst(
+				var newLists = A3(
+					_donny$ideaboard$App$updateItem,
+					_p15._0,
+					model.lists,
+					function (item) {
+						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$RenamingCard, _p11._1, _p11._2),
-								_p27))
-					} : {ctor: '_Tuple2', _0: _p26, _1: _p27};
-				};
+								A2(_donny$ideaboard$CardList$RenamingCard, _p15._1, _p15._2),
+								item));
+					});
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							lists: A2(_elm_lang$core$List$map, updateCardList, model.lists)
-						}),
+						{lists: newLists}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpvoteCard':
-				var updateCardList = function (_p28) {
-					var _p29 = _p28;
-					var _p31 = _p29._1;
-					var _p30 = _p29._0;
-					return _elm_lang$core$Native_Utils.eq(_p30, _p11._0) ? {
-						ctor: '_Tuple2',
-						_0: _p30,
-						_1: _elm_lang$core$Basics$fst(
+				var newLists = A3(
+					_donny$ideaboard$App$updateItem,
+					_p15._0,
+					model.lists,
+					function (item) {
+						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$UpvotingCard, _p11._1, _p11._2),
-								_p31))
-					} : {ctor: '_Tuple2', _0: _p30, _1: _p31};
-				};
+								A2(_donny$ideaboard$CardList$UpvotingCard, _p15._1, _p15._2),
+								item));
+					});
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							lists: A2(_elm_lang$core$List$map, updateCardList, model.lists)
-						}),
+						{lists: newLists}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Modify':
-				var _p39 = _p11._0;
-				var updateCardList = function (_p32) {
-					var _p33 = _p32;
-					var _p36 = _p33._1;
-					var _p35 = _p33._0;
-					if (_elm_lang$core$Native_Utils.eq(_p35, _p39)) {
-						var _p34 = A2(_donny$ideaboard$CardList$update, _p11._1, _p36);
-						var newListModel = _p34._0;
-						var dispatch = _p34._1;
+				var _p27 = _p15._0;
+				var updateCardList = function (_p20) {
+					var _p21 = _p20;
+					var _p24 = _p21._1;
+					var _p23 = _p21._0;
+					if (_elm_lang$core$Native_Utils.eq(_p23, _p27)) {
+						var _p22 = A2(_donny$ideaboard$CardList$update, _p15._1, _p24);
+						var newListModel = _p22._0;
+						var dispatch = _p22._1;
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p35, _1: newListModel},
+							_0: {ctor: '_Tuple2', _0: _p23, _1: newListModel},
 							_1: dispatch
 						};
 					} else {
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p35, _1: _p36},
+							_0: {ctor: '_Tuple2', _0: _p23, _1: _p24},
 							_1: _elm_lang$core$Maybe$Nothing
 						};
 					}
 				};
-				var _p37 = _elm_lang$core$List$unzip(
+				var _p25 = _elm_lang$core$List$unzip(
 					A2(_elm_lang$core$List$map, updateCardList, model.lists));
-				var lists = _p37._0;
-				var dispatches = _p37._1;
+				var lists = _p25._0;
+				var dispatches = _p25._1;
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
 					{lists: lists});
-				var _p38 = _elm_lang$core$List$head(
+				var _p26 = _elm_lang$core$List$head(
 					A2(_elm_lang$core$List$filterMap, _elm_lang$core$Basics$identity, dispatches));
-				if (_p38.ctor === 'Nothing') {
+				if (_p26.ctor === 'Nothing') {
 					return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
 				} else {
-					switch (_p38._0.ctor) {
+					switch (_p26._0.ctor) {
 						case 'RequestRename':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A2(_donny$ideaboard$App$REQ_RENAMELIST, _p39, _p38._0._0),
+								A2(_donny$ideaboard$App$REQ_RENAMELIST, _p27, _p26._0._0),
 								newModel);
 						case 'RequestNewCard':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								_donny$ideaboard$App$REQ_NEWCARD(_p39),
+								_donny$ideaboard$App$REQ_NEWCARD(_p27),
 								newModel);
 						case 'RequestRenameCard':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A3(_donny$ideaboard$App$REQ_RENAMECARD, _p39, _p38._0._0, _p38._0._1),
+								A3(_donny$ideaboard$App$REQ_RENAMECARD, _p27, _p26._0._0, _p26._0._1),
 								newModel);
 						default:
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A2(_donny$ideaboard$App$REQ_UPVOTECARD, _p39, _p38._0._0),
+								A2(_donny$ideaboard$App$REQ_UPVOTECARD, _p27, _p26._0._0),
 								newModel);
 					}
 				}
 			case 'SendNetworkRequest':
-				return A2(_donny$ideaboard$App$networkRequestHandler, _p11._0, model);
+				return A2(_donny$ideaboard$App$networkRequestHandler, _p15._0, model);
 			default:
 				return A2(
 					_donny$ideaboard$App$networkResponseHandler,
-					_donny$ideaboard$App$decodeNetworkResponse(_p11._0),
+					_donny$ideaboard$App$decodeNetworkResponse(_p15._0),
 					model);
 		}
 	});
 var _donny$ideaboard$App$networkResponseHandler = F2(
 	function (resp, model) {
-		var _p40 = resp;
-		switch (_p40.ctor) {
+		var _p28 = resp;
+		switch (_p28.ctor) {
 			case 'RESP_ERROR':
 				return A2(_donny$ideaboard$App$update, _donny$ideaboard$App$NoOp, model);
 			case 'RESP_REFRESH':
 				return A2(
 					_donny$ideaboard$App$update,
-					_donny$ideaboard$App$Refresh(_p40._0),
+					_donny$ideaboard$App$Refresh(_p28._0),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));
 			case 'RESP_NEWLIST':
 				return A2(
 					_donny$ideaboard$App$update,
-					A2(_donny$ideaboard$App$InsertList, _p40._0, _p40._1),
+					A2(_donny$ideaboard$App$InsertList, _p28._0, _p28._1),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));
 			case 'RESP_RENAMELIST':
 				return A2(
 					_donny$ideaboard$App$update,
-					A2(_donny$ideaboard$App$RenameList, _p40._0, _p40._1),
+					A2(_donny$ideaboard$App$RenameList, _p28._0, _p28._1),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));
 			case 'RESP_NEWCARD':
 				return A2(
 					_donny$ideaboard$App$update,
-					A3(_donny$ideaboard$App$InsertCard, _p40._0, _p40._1, _p40._2),
+					A3(_donny$ideaboard$App$InsertCard, _p28._0, _p28._1, _p28._2),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));
 			case 'RESP_RENAMECARD':
 				return A2(
 					_donny$ideaboard$App$update,
-					A3(_donny$ideaboard$App$RenameCard, _p40._0, _p40._1, _p40._2),
+					A3(_donny$ideaboard$App$RenameCard, _p28._0, _p28._1, _p28._2),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));
 			default:
 				return A2(
 					_donny$ideaboard$App$update,
-					A3(_donny$ideaboard$App$UpvoteCard, _p40._0, _p40._1, _p40._2),
+					A3(_donny$ideaboard$App$UpvoteCard, _p28._0, _p28._1, _p28._2),
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{isProcessing: false}));

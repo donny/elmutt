@@ -52,6 +52,18 @@ type Msg
     | NetworkResponseDidReceive String
 
 
+updateItem : ID -> List ( ID, a ) -> (a -> a) -> List ( ID, a )
+updateItem identifier list update =
+    List.map
+        (\( id, item ) ->
+            if identifier == id then
+                ( id, update item )
+            else
+                ( id, item )
+        )
+        list
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -94,43 +106,31 @@ update msg model =
 
         RenameList identifier text ->
             let
-                updateCardList ( listID, listModel ) =
-                    if listID == identifier then
-                        ( listID, { listModel | text = text } )
-                    else
-                        ( listID, listModel )
+                newLists =
+                    updateItem identifier model.lists (\item -> { item | text = text })
             in
-                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+                ( { model | lists = newLists }, Cmd.none )
 
         InsertCard listidentifier identifier text ->
             let
-                updateCardList ( listID, listModel ) =
-                    if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.InsertingCard identifier text) listModel) )
-                    else
-                        ( listID, listModel )
+                newLists =
+                    updateItem listidentifier model.lists (\item -> fst (CardList.update (CardList.InsertingCard identifier text) item))
             in
-                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+                ( { model | lists = newLists }, Cmd.none )
 
         RenameCard listidentifier identifier text ->
             let
-                updateCardList ( listID, listModel ) =
-                    if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.RenamingCard identifier text) listModel) )
-                    else
-                        ( listID, listModel )
+                newLists =
+                    updateItem listidentifier model.lists (\item -> fst (CardList.update (CardList.RenamingCard identifier text) item))
             in
-                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+                ( { model | lists = newLists }, Cmd.none )
 
         UpvoteCard listidentifier identifier counter ->
             let
-                updateCardList ( listID, listModel ) =
-                    if listID == listidentifier then
-                        ( listID, fst (CardList.update (CardList.UpvotingCard identifier counter) listModel) )
-                    else
-                        ( listID, listModel )
+                newLists =
+                    updateItem listidentifier model.lists (\item -> fst (CardList.update (CardList.UpvotingCard identifier counter) item))
             in
-                ( { model | lists = List.map updateCardList model.lists }, Cmd.none )
+                ( { model | lists = newLists }, Cmd.none )
 
         Modify id listMsg ->
             let
