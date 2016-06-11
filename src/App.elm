@@ -246,7 +246,7 @@ type NetworkResponse
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
 networkRequestHandler req model =
     let
-        sendRequest model requestString =
+        handleNetRequest model requestString =
             ( { model | isProcessing = True }, WebSocket.send (model.backend ++ "/submit") requestString )
     in
         case req of
@@ -254,47 +254,51 @@ networkRequestHandler req model =
                 ( { model | isConnected = True }, WebSocket.send (model.backend ++ "/submit") """{"REQ":"NOOP"}""" )
 
             REQ_REFRESH ->
-                sendRequest model """{"REQ":"REFRESH"}"""
+                handleNetRequest model """{"REQ":"REFRESH"}"""
 
             REQ_NEWLIST ->
-                sendRequest model """{"REQ":"NEWLIST"}"""
+                handleNetRequest model """{"REQ":"NEWLIST"}"""
 
             REQ_RENAMELIST identifier text ->
-                sendRequest model ("{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
+                handleNetRequest model ("{\"REQ\":\"RENAMELIST\", \"IDENTIFIER\":\"" ++ identifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
 
             REQ_NEWCARD identifier ->
-                sendRequest model ("{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}")
+                handleNetRequest model ("{\"REQ\":\"NEWCARD\", \"LISTIDENTIFIER\":\"" ++ identifier ++ "\"}")
 
             REQ_RENAMECARD listidentifier cardIdentifier text ->
-                sendRequest model ("{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
+                handleNetRequest model ("{\"REQ\":\"RENAMECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\", \"TEXT\":\"" ++ text ++ "\"}")
 
             REQ_UPVOTECARD listidentifier cardIdentifier ->
-                sendRequest model ("{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}")
+                handleNetRequest model ("{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}")
 
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
-    case resp of
-        RESP_ERROR ->
-            update NoOp model
+    let
+        handleNetResponse msg model =
+            update msg { model | isProcessing = False }
+    in
+        case resp of
+            RESP_ERROR ->
+                update NoOp model
 
-        RESP_REFRESH newList ->
-            update (Refresh newList) { model | isProcessing = False }
+            RESP_REFRESH newList ->
+                handleNetResponse (Refresh newList) model
 
-        RESP_NEWLIST identifier text ->
-            update (InsertList identifier text) { model | isProcessing = False }
+            RESP_NEWLIST identifier text ->
+                handleNetResponse (InsertList identifier text) model
 
-        RESP_RENAMELIST identifier text ->
-            update (RenameList identifier text) { model | isProcessing = False }
+            RESP_RENAMELIST identifier text ->
+                handleNetResponse (RenameList identifier text) model
 
-        RESP_NEWCARD listidentifier identifier text ->
-            update (InsertCard listidentifier identifier text) { model | isProcessing = False }
+            RESP_NEWCARD listidentifier identifier text ->
+                handleNetResponse (InsertCard listidentifier identifier text) model
 
-        RESP_RENAMECARD listidentifier identifier text ->
-            update (RenameCard listidentifier identifier text) { model | isProcessing = False }
+            RESP_RENAMECARD listidentifier identifier text ->
+                handleNetResponse (RenameCard listidentifier identifier text) model
 
-        RESP_UPVOTECARD listidentifier identifier counter ->
-            update (UpvoteCard listidentifier identifier counter) { model | isProcessing = False }
+            RESP_UPVOTECARD listidentifier identifier counter ->
+                handleNetResponse (UpvoteCard listidentifier identifier counter) model
 
 
 decodeNetworkResponse : String -> NetworkResponse

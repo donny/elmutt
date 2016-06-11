@@ -8634,7 +8634,7 @@ _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/web
 
 var _donny$ideaboard$App$networkRequestHandler = F2(
 	function (req, model) {
-		var sendRequest = F2(
+		var handleNetRequest = F2(
 			function (model, requestString) {
 				return {
 					ctor: '_Tuple2',
@@ -8661,12 +8661,12 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 						'{\"REQ\":\"NOOP\"}')
 				};
 			case 'REQ_REFRESH':
-				return A2(sendRequest, model, '{\"REQ\":\"REFRESH\"}');
+				return A2(handleNetRequest, model, '{\"REQ\":\"REFRESH\"}');
 			case 'REQ_NEWLIST':
-				return A2(sendRequest, model, '{\"REQ\":\"NEWLIST\"}');
+				return A2(handleNetRequest, model, '{\"REQ\":\"NEWLIST\"}');
 			case 'REQ_RENAMELIST':
 				return A2(
-					sendRequest,
+					handleNetRequest,
 					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -8680,7 +8680,7 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 								A2(_elm_lang$core$Basics_ops['++'], _p0._1, '\"}')))));
 			case 'REQ_NEWCARD':
 				return A2(
-					sendRequest,
+					handleNetRequest,
 					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -8688,7 +8688,7 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 						A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}')));
 			case 'REQ_RENAMECARD':
 				return A2(
-					sendRequest,
+					handleNetRequest,
 					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -8708,7 +8708,7 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 										A2(_elm_lang$core$Basics_ops['++'], _p0._2, '\"}')))))));
 			default:
 				return A2(
-					sendRequest,
+					handleNetRequest,
 					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -9296,52 +9296,49 @@ var _donny$ideaboard$App$update = F2(
 	});
 var _donny$ideaboard$App$networkResponseHandler = F2(
 	function (resp, model) {
+		var handleNetResponse = F2(
+			function (msg, model) {
+				return A2(
+					_donny$ideaboard$App$update,
+					msg,
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{isProcessing: false}));
+			});
 		var _p28 = resp;
 		switch (_p28.ctor) {
 			case 'RESP_ERROR':
 				return A2(_donny$ideaboard$App$update, _donny$ideaboard$App$NoOp, model);
 			case 'RESP_REFRESH':
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					_donny$ideaboard$App$Refresh(_p28._0),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 			case 'RESP_NEWLIST':
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					A2(_donny$ideaboard$App$InsertList, _p28._0, _p28._1),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 			case 'RESP_RENAMELIST':
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					A2(_donny$ideaboard$App$RenameList, _p28._0, _p28._1),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 			case 'RESP_NEWCARD':
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					A3(_donny$ideaboard$App$InsertCard, _p28._0, _p28._1, _p28._2),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 			case 'RESP_RENAMECARD':
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					A3(_donny$ideaboard$App$RenameCard, _p28._0, _p28._1, _p28._2),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 			default:
 				return A2(
-					_donny$ideaboard$App$update,
+					handleNetResponse,
 					A3(_donny$ideaboard$App$UpvoteCard, _p28._0, _p28._1, _p28._2),
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{isProcessing: false}));
+					model);
 		}
 	});
 var _donny$ideaboard$App$main = {
