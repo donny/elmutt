@@ -301,6 +301,16 @@ networkResponseHandler resp model =
                 handleNetResponse (UpvoteCard listidentifier identifier counter) model
 
 
+handleDecodedNetworkResponse : Result String a -> (a -> NetworkResponse) -> NetworkResponse
+handleDecodedNetworkResponse caseConditional update =
+    case caseConditional of
+        Err error ->
+            RESP_ERROR
+
+        Ok value ->
+            update value
+
+
 decodeNetworkResponse : String -> NetworkResponse
 decodeNetworkResponse message =
     case (decodeString ("RESP" := string) message) of
@@ -317,72 +327,42 @@ decodeNetworkResponse message =
                         parsedCardList =
                             object3 (,,) ("identifier" := string) ("text" := string) ("cards" := (list parsedCard))
                     in
-                        case (decodeString ("DATA" := (list parsedCardList)) message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok newList ->
-                                RESP_REFRESH newList
+                        handleDecodedNetworkResponse (decodeString ("DATA" := (list parsedCardList)) message) (\newList -> RESP_REFRESH newList)
 
                 "RESP_NEWLIST" ->
                     let
                         parsedCardList =
                             object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCardList message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok ( identifier, text ) ->
-                                RESP_NEWLIST identifier text
+                        handleDecodedNetworkResponse (decodeString parsedCardList message) (\( identifier, text ) -> RESP_NEWLIST identifier text)
 
                 "RESP_RENAMELIST" ->
                     let
                         parsedCardList =
                             object2 (,) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCardList message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok ( identifier, text ) ->
-                                RESP_RENAMELIST identifier text
+                        handleDecodedNetworkResponse (decodeString parsedCardList message) (\( identifier, text ) -> RESP_RENAMELIST identifier text)
 
                 "RESP_NEWCARD" ->
                     let
                         parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCard message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok ( listidentifier, identifier, text ) ->
-                                RESP_NEWCARD listidentifier identifier text
+                        handleDecodedNetworkResponse (decodeString parsedCard message) (\( listidentifier, identifier, text ) -> RESP_NEWCARD listidentifier identifier text)
 
                 "RESP_RENAMECARD" ->
                     let
                         parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("TEXT" := string)
                     in
-                        case (decodeString parsedCard message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok ( listidentifier, identifier, text ) ->
-                                RESP_RENAMECARD listidentifier identifier text
+                        handleDecodedNetworkResponse (decodeString parsedCard message) (\( listidentifier, identifier, text ) -> RESP_RENAMECARD listidentifier identifier text)
 
                 "RESP_UPVOTECARD" ->
                     let
                         parsedCard =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("COUNTER" := int)
                     in
-                        case (decodeString parsedCard message) of
-                            Err error ->
-                                RESP_ERROR
-
-                            Ok ( listidentifier, identifier, counter ) ->
-                                RESP_UPVOTECARD listidentifier identifier counter
+                        handleDecodedNetworkResponse (decodeString parsedCard message) (\( listidentifier, identifier, counter ) -> RESP_UPVOTECARD listidentifier identifier counter)
 
                 _ ->
                     RESP_ERROR
