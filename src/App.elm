@@ -302,8 +302,8 @@ networkResponseHandler resp model =
 
 
 handleDecodedNetworkResponse : Result String a -> (a -> NetworkResponse) -> NetworkResponse
-handleDecodedNetworkResponse caseConditional update =
-    case caseConditional of
+handleDecodedNetworkResponse decodedValue update =
+    case decodedValue of
         Err error ->
             RESP_ERROR
 

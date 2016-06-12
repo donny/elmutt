@@ -8966,8 +8966,8 @@ var _donny$ideaboard$App$RESP_REFRESH = function (a) {
 };
 var _donny$ideaboard$App$RESP_ERROR = {ctor: 'RESP_ERROR'};
 var _donny$ideaboard$App$handleDecodedNetworkResponse = F2(
-	function (caseConditional, update) {
-		var _p7 = caseConditional;
+	function (decodedValue, update) {
+		var _p7 = decodedValue;
 		if (_p7.ctor === 'Err') {
 			return _donny$ideaboard$App$RESP_ERROR;
 		} else {
