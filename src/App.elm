@@ -212,9 +212,24 @@ view model =
                 , cardListViews
                 ]
         else
-            div []
-                [ nav [ class "navbar navbar-light" ]
-                    [ button [ class "btn btn-secondary", onClick (SendNetworkRequest REQ_CONNECT) ] [ text "Connect" ]
+            div [ class "container" ]
+                [ div [ class "row" ]
+                    [ div [ class "col-md-6 col-md-offset-3" ]
+                        [ br [] []
+                        , br [] []
+                        , h1 [ class "display-3" ] [ text "Hi there!" ]
+                        , p [ class "lead" ] [ text "You have been invited to participate in a discussion..." ]
+                        , hr [ class "m-y-2" ] []
+                        , p []
+                            [ text "If it has started already, please tap"
+                            , strong [] [ text " Refresh " ]
+                            , text "later to load the discussion."
+                            ]
+                        , button [ class "btn btn-secondary", onClick (SendNetworkRequest REQ_CONNECT) ] [ text "Get started" ]
+                          -- nav [ class "navbar navbar-light" ]
+                          --     [ button [ class "btn btn-secondary", onClick (SendNetworkRequest REQ_CONNECT) ] [ text "Connect" ]
+                          --     ]
+                        ]
                     ]
                 ]
 
