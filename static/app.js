@@ -7154,11 +7154,12 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _donny$ideaboard$Card$Model = F3(
-	function (a, b, c) {
-		return {counter: a, text: b, isEditingText: c};
+var _donny$ideaboard$Card$Model = F4(
+	function (a, b, c, d) {
+		return {counter: a, text: b, isHidden: c, isEditingText: d};
 	});
-var _donny$ideaboard$Card$model = A3(_donny$ideaboard$Card$Model, 0, 'Untitled', false);
+var _donny$ideaboard$Card$model = A4(_donny$ideaboard$Card$Model, 0, 'Untitled', false, false);
+var _donny$ideaboard$Card$RequestHide = {ctor: 'RequestHide'};
 var _donny$ideaboard$Card$RequestUpvote = {ctor: 'RequestUpvote'};
 var _donny$ideaboard$Card$RequestRename = function (a) {
 	return {ctor: 'RequestRename', _0: a};
@@ -7192,14 +7193,21 @@ var _donny$ideaboard$Card$update = F2(
 						{text: _p0._0}),
 					_1: _elm_lang$core$Maybe$Nothing
 				};
-			default:
+			case 'Upvote':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
 					_1: _elm_lang$core$Maybe$Just(_donny$ideaboard$Card$RequestUpvote)
 				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _elm_lang$core$Maybe$Just(_donny$ideaboard$Card$RequestHide)
+				};
 		}
 	});
+var _donny$ideaboard$Card$Hide = {ctor: 'Hide'};
 var _donny$ideaboard$Card$Upvote = {ctor: 'Upvote'};
 var _donny$ideaboard$Card$TextChanged = function (a) {
 	return {ctor: 'TextChanged', _0: a};
@@ -7207,7 +7215,12 @@ var _donny$ideaboard$Card$TextChanged = function (a) {
 var _donny$ideaboard$Card$FinishEditingText = {ctor: 'FinishEditingText'};
 var _donny$ideaboard$Card$StartEditingText = {ctor: 'StartEditingText'};
 var _donny$ideaboard$Card$view = function (model) {
-	return A2(
+	return model.isHidden ? A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[])) : A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[
@@ -7253,67 +7266,114 @@ var _donny$ideaboard$Card$view = function (model) {
 						_elm_lang$html$Html$div,
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_elm_lang$html$Html_Attributes$class('btn-group dropup btn-group-sm')
+								_elm_lang$html$Html_Attributes$class('text-xs-center')
 							]),
 						_elm_lang$core$Native_List.fromArray(
 							[
 								A2(
-								_elm_lang$html$Html$button,
+								_elm_lang$html$Html$div,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
-										_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$Upvote)
-									]),
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html$text(
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString(model.counter),
-											'  ')),
-										A2(
-										_elm_lang$html$Html$i,
-										_elm_lang$core$Native_List.fromArray(
-											[
-												_elm_lang$html$Html_Attributes$class('fa fa-thumbs-o-up')
-											]),
-										_elm_lang$core$Native_List.fromArray(
-											[]))
-									])),
-								model.isEditingText ? A2(
-								_elm_lang$html$Html$button,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
-										_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$FinishEditingText)
+										_elm_lang$html$Html_Attributes$class('btn-group dropup btn-group-sm')
 									]),
 								_elm_lang$core$Native_List.fromArray(
 									[
 										A2(
-										_elm_lang$html$Html$i,
+										_elm_lang$html$Html$button,
 										_elm_lang$core$Native_List.fromArray(
 											[
-												_elm_lang$html$Html_Attributes$class('fa fa-check-square-o')
+												_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
+												_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$Upvote)
 											]),
 										_elm_lang$core$Native_List.fromArray(
-											[]))
-									])) : A2(
-								_elm_lang$html$Html$button,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
-										_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$StartEditingText)
-									]),
-								_elm_lang$core$Native_List.fromArray(
-									[
+											[
+												_elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(model.counter),
+													'  ')),
+												A2(
+												_elm_lang$html$Html$i,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('fa fa-thumbs-o-up')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[]))
+											])),
+										model.isEditingText ? A2(
+										_elm_lang$html$Html$button,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
+												_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$FinishEditingText)
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$i,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('fa fa-check-square-o')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[]))
+											])) : A2(
+										_elm_lang$html$Html$button,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('btn btn-secondary'),
+												_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$StartEditingText)
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$i,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('fa fa-pencil-square-o')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[]))
+											])),
 										A2(
-										_elm_lang$html$Html$i,
+										_elm_lang$html$Html$button,
 										_elm_lang$core$Native_List.fromArray(
 											[
-												_elm_lang$html$Html_Attributes$class('fa fa-pencil-square-o')
+												_elm_lang$html$Html_Attributes$class('btn btn-secondary dropdown-toggle'),
+												A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'dropdown')
 											]),
 										_elm_lang$core$Native_List.fromArray(
-											[]))
+											[
+												A2(
+												_elm_lang$html$Html$i,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('fa fa-trash-o')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[]))
+											])),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('dropdown-menu')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$a,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('dropdown-item'),
+														_elm_lang$html$Html_Events$onClick(_donny$ideaboard$Card$Hide)
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html$text('Delete')
+													]))
+											]))
 									]))
 							]))
 					]))
@@ -7368,6 +7428,9 @@ var _donny$ideaboard$CardList$Model = F3(
 	function (a, b, c) {
 		return {text: a, isEditingText: b, cards: c};
 	});
+var _donny$ideaboard$CardList$RequestHideCard = function (a) {
+	return {ctor: 'RequestHideCard', _0: a};
+};
 var _donny$ideaboard$CardList$RequestUpvoteCard = function (a) {
 	return {ctor: 'RequestUpvoteCard', _0: a};
 };
@@ -7479,55 +7542,85 @@ var _donny$ideaboard$CardList$update = F2(
 						}),
 					_1: _elm_lang$core$Maybe$Nothing
 				};
-			default:
-				var _p16 = _p0._0;
+			case 'HidingCard':
 				var updateCard = function (_p9) {
 					var _p10 = _p9;
-					var _p13 = _p10._1;
-					var _p12 = _p10._0;
-					if (_elm_lang$core$Native_Utils.eq(_p12, _p16)) {
-						var _p11 = A2(_donny$ideaboard$Card$update, _p0._1, _p13);
-						var newCardModel = _p11._0;
-						var dispatch = _p11._1;
+					var _p12 = _p10._1;
+					var _p11 = _p10._0;
+					return _elm_lang$core$Native_Utils.eq(_p11, _p0._0) ? {
+						ctor: '_Tuple2',
+						_0: _p11,
+						_1: _elm_lang$core$Native_Utils.update(
+							_p12,
+							{isHidden: true})
+					} : {ctor: '_Tuple2', _0: _p11, _1: _p12};
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							cards: A2(_elm_lang$core$List$map, updateCard, model.cards)
+						}),
+					_1: _elm_lang$core$Maybe$Nothing
+				};
+			default:
+				var _p20 = _p0._0;
+				var updateCard = function (_p13) {
+					var _p14 = _p13;
+					var _p17 = _p14._1;
+					var _p16 = _p14._0;
+					if (_elm_lang$core$Native_Utils.eq(_p16, _p20)) {
+						var _p15 = A2(_donny$ideaboard$Card$update, _p0._1, _p17);
+						var newCardModel = _p15._0;
+						var dispatch = _p15._1;
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p12, _1: newCardModel},
+							_0: {ctor: '_Tuple2', _0: _p16, _1: newCardModel},
 							_1: dispatch
 						};
 					} else {
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p12, _1: _p13},
+							_0: {ctor: '_Tuple2', _0: _p16, _1: _p17},
 							_1: _elm_lang$core$Maybe$Nothing
 						};
 					}
 				};
-				var _p14 = _elm_lang$core$List$unzip(
+				var _p18 = _elm_lang$core$List$unzip(
 					A2(_elm_lang$core$List$map, updateCard, model.cards));
-				var cards = _p14._0;
-				var dispatches = _p14._1;
+				var cards = _p18._0;
+				var dispatches = _p18._1;
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
 					{cards: cards});
-				var _p15 = _elm_lang$core$List$head(
+				var _p19 = _elm_lang$core$List$head(
 					A2(_elm_lang$core$List$filterMap, _elm_lang$core$Basics$identity, dispatches));
-				if (_p15.ctor === 'Nothing') {
+				if (_p19.ctor === 'Nothing') {
 					return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Maybe$Nothing};
 				} else {
-					if (_p15._0.ctor === 'RequestRename') {
-						return {
-							ctor: '_Tuple2',
-							_0: newModel,
-							_1: _elm_lang$core$Maybe$Just(
-								A2(_donny$ideaboard$CardList$RequestRenameCard, _p16, _p15._0._0))
-						};
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: newModel,
-							_1: _elm_lang$core$Maybe$Just(
-								_donny$ideaboard$CardList$RequestUpvoteCard(_p16))
-						};
+					switch (_p19._0.ctor) {
+						case 'RequestRename':
+							return {
+								ctor: '_Tuple2',
+								_0: newModel,
+								_1: _elm_lang$core$Maybe$Just(
+									A2(_donny$ideaboard$CardList$RequestRenameCard, _p20, _p19._0._0))
+							};
+						case 'RequestUpvote':
+							return {
+								ctor: '_Tuple2',
+								_0: newModel,
+								_1: _elm_lang$core$Maybe$Just(
+									_donny$ideaboard$CardList$RequestUpvoteCard(_p20))
+							};
+						default:
+							return {
+								ctor: '_Tuple2',
+								_0: newModel,
+								_1: _elm_lang$core$Maybe$Just(
+									_donny$ideaboard$CardList$RequestHideCard(_p20))
+							};
 					}
 				}
 		}
@@ -7536,6 +7629,9 @@ var _donny$ideaboard$CardList$Modify = F2(
 	function (a, b) {
 		return {ctor: 'Modify', _0: a, _1: b};
 	});
+var _donny$ideaboard$CardList$HidingCard = function (a) {
+	return {ctor: 'HidingCard', _0: a};
+};
 var _donny$ideaboard$CardList$UpvotingCard = F2(
 	function (a, b) {
 		return {ctor: 'UpvotingCard', _0: a, _1: b};
@@ -7555,12 +7651,12 @@ var _donny$ideaboard$CardList$TextChanged = function (a) {
 var _donny$ideaboard$CardList$FinishEditingText = {ctor: 'FinishEditingText'};
 var _donny$ideaboard$CardList$StartEditingText = {ctor: 'StartEditingText'};
 var _donny$ideaboard$CardList$view = function (model) {
-	var cardView = function (_p17) {
-		var _p18 = _p17;
+	var cardView = function (_p21) {
+		var _p22 = _p21;
 		return A2(
 			_elm_lang$html$Html_App$map,
-			_donny$ideaboard$CardList$Modify(_p18._0),
-			_donny$ideaboard$Card$view(_p18._1));
+			_donny$ideaboard$CardList$Modify(_p22._0),
+			_donny$ideaboard$Card$view(_p22._1));
 	};
 	var cardViews = A2(
 		_elm_lang$html$Html$div,
@@ -8706,13 +8802,27 @@ var _donny$ideaboard$App$networkRequestHandler = F2(
 										_elm_lang$core$Basics_ops['++'],
 										'\", \"TEXT\":\"',
 										A2(_elm_lang$core$Basics_ops['++'], _p0._2, '\"}')))))));
-			default:
+			case 'REQ_UPVOTECARD':
 				return A2(
 					handleNetRequest,
 					model,
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						'{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p0._1,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\", \"LISTIDENTIFIER\":\"',
+								A2(_elm_lang$core$Basics_ops['++'], _p0._0, '\"}')))));
+			default:
+				return A2(
+					handleNetRequest,
+					model,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'{\"REQ\":\"HIDECARD\", \"IDENTIFIER\":\"',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
 							_p0._1,
@@ -8771,6 +8881,10 @@ var _donny$ideaboard$App$Modify = F2(
 	function (a, b) {
 		return {ctor: 'Modify', _0: a, _1: b};
 	});
+var _donny$ideaboard$App$HideCard = F2(
+	function (a, b) {
+		return {ctor: 'HideCard', _0: a, _1: b};
+	});
 var _donny$ideaboard$App$UpvoteCard = F3(
 	function (a, b, c) {
 		return {ctor: 'UpvoteCard', _0: a, _1: b, _2: c};
@@ -8795,6 +8909,10 @@ var _donny$ideaboard$App$Refresh = function (a) {
 	return {ctor: 'Refresh', _0: a};
 };
 var _donny$ideaboard$App$NoOp = {ctor: 'NoOp'};
+var _donny$ideaboard$App$REQ_HIDECARD = F2(
+	function (a, b) {
+		return {ctor: 'REQ_HIDECARD', _0: a, _1: b};
+	});
 var _donny$ideaboard$App$REQ_UPVOTECARD = F2(
 	function (a, b) {
 		return {ctor: 'REQ_UPVOTECARD', _0: a, _1: b};
@@ -9009,6 +9127,10 @@ var _donny$ideaboard$App$view = function (model) {
 					]))
 			]));
 };
+var _donny$ideaboard$App$RESP_HIDECARD = F2(
+	function (a, b) {
+		return {ctor: 'RESP_HIDECARD', _0: a, _1: b};
+	});
 var _donny$ideaboard$App$RESP_UPVOTECARD = F3(
 	function (a, b, c) {
 		return {ctor: 'RESP_UPVOTECARD', _0: a, _1: b, _2: c};
@@ -9169,6 +9291,22 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 						var _p19 = _p18;
 						return A3(_donny$ideaboard$App$RESP_UPVOTECARD, _p19._0, _p19._1, _p19._2);
 					});
+			case 'RESP_HIDECARD':
+				var parsedCard = A3(
+					_elm_lang$core$Json_Decode$object2,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'LISTIDENTIFIER', _elm_lang$core$Json_Decode$string),
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'IDENTIFIER', _elm_lang$core$Json_Decode$string));
+				return A2(
+					_donny$ideaboard$App$handleDecodedNetworkResponse,
+					A2(_elm_lang$core$Json_Decode$decodeString, parsedCard, message),
+					function (_p20) {
+						var _p21 = _p20;
+						return A2(_donny$ideaboard$App$RESP_HIDECARD, _p21._0, _p21._1);
+					});
 			default:
 				return _donny$ideaboard$App$RESP_ERROR;
 		}
@@ -9176,37 +9314,37 @@ var _donny$ideaboard$App$decodeNetworkResponse = function (message) {
 };
 var _donny$ideaboard$App$update = F2(
 	function (msg, model) {
-		var _p20 = msg;
-		switch (_p20.ctor) {
+		var _p22 = msg;
+		switch (_p22.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Refresh':
-				var updateCard = function (_p21) {
-					var _p22 = _p21;
-					var newCard = _donny$ideaboard$Card$model;
-					return {
-						ctor: '_Tuple2',
-						_0: _p22._0,
-						_1: _elm_lang$core$Native_Utils.update(
-							newCard,
-							{text: _p22._1, counter: _p22._2})
-					};
-				};
-				var updateCardList = function (_p23) {
+				var updateCard = function (_p23) {
 					var _p24 = _p23;
-					var newCardList = _donny$ideaboard$CardList$model;
+					var newCard = _donny$ideaboard$Card$model;
 					return {
 						ctor: '_Tuple2',
 						_0: _p24._0,
 						_1: _elm_lang$core$Native_Utils.update(
+							newCard,
+							{text: _p24._1, counter: _p24._2})
+					};
+				};
+				var updateCardList = function (_p25) {
+					var _p26 = _p25;
+					var newCardList = _donny$ideaboard$CardList$model;
+					return {
+						ctor: '_Tuple2',
+						_0: _p26._0,
+						_1: _elm_lang$core$Native_Utils.update(
 							newCardList,
 							{
-								text: _p24._1,
-								cards: A2(_elm_lang$core$List$map, updateCard, _p24._2)
+								text: _p26._1,
+								cards: A2(_elm_lang$core$List$map, updateCard, _p26._2)
 							})
 					};
 				};
-				var lists = A2(_elm_lang$core$List$map, updateCardList, _p20._0);
+				var lists = A2(_elm_lang$core$List$map, updateCardList, _p22._0);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -9218,10 +9356,10 @@ var _donny$ideaboard$App$update = F2(
 				var newModel = _donny$ideaboard$CardList$model;
 				var newList = {
 					ctor: '_Tuple2',
-					_0: _p20._0,
+					_0: _p22._0,
 					_1: _elm_lang$core$Native_Utils.update(
 						newModel,
-						{text: _p20._1})
+						{text: _p22._1})
 				};
 				var newLists = A2(
 					_elm_lang$core$Basics_ops['++'],
@@ -9238,12 +9376,12 @@ var _donny$ideaboard$App$update = F2(
 			case 'RenameList':
 				var newLists = A3(
 					_donny$ideaboard$App$updateItem,
-					_p20._0,
+					_p22._0,
 					model.lists,
 					function (item) {
 						return _elm_lang$core$Native_Utils.update(
 							item,
-							{text: _p20._1});
+							{text: _p22._1});
 					});
 				return {
 					ctor: '_Tuple2',
@@ -9255,13 +9393,13 @@ var _donny$ideaboard$App$update = F2(
 			case 'InsertCard':
 				var newLists = A3(
 					_donny$ideaboard$App$updateItem,
-					_p20._0,
+					_p22._0,
 					model.lists,
 					function (item) {
 						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$InsertingCard, _p20._1, _p20._2),
+								A2(_donny$ideaboard$CardList$InsertingCard, _p22._1, _p22._2),
 								item));
 					});
 				return {
@@ -9274,13 +9412,13 @@ var _donny$ideaboard$App$update = F2(
 			case 'RenameCard':
 				var newLists = A3(
 					_donny$ideaboard$App$updateItem,
-					_p20._0,
+					_p22._0,
 					model.lists,
 					function (item) {
 						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$RenamingCard, _p20._1, _p20._2),
+								A2(_donny$ideaboard$CardList$RenamingCard, _p22._1, _p22._2),
 								item));
 					});
 				return {
@@ -9293,13 +9431,32 @@ var _donny$ideaboard$App$update = F2(
 			case 'UpvoteCard':
 				var newLists = A3(
 					_donny$ideaboard$App$updateItem,
-					_p20._0,
+					_p22._0,
 					model.lists,
 					function (item) {
 						return _elm_lang$core$Basics$fst(
 							A2(
 								_donny$ideaboard$CardList$update,
-								A2(_donny$ideaboard$CardList$UpvotingCard, _p20._1, _p20._2),
+								A2(_donny$ideaboard$CardList$UpvotingCard, _p22._1, _p22._2),
+								item));
+					});
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{lists: newLists}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'HideCard':
+				var newLists = A3(
+					_donny$ideaboard$App$updateItem,
+					_p22._0,
+					model.lists,
+					function (item) {
+						return _elm_lang$core$Basics$fst(
+							A2(
+								_donny$ideaboard$CardList$update,
+								_donny$ideaboard$CardList$HidingCard(_p22._1),
 								item));
 					});
 				return {
@@ -9310,69 +9467,74 @@ var _donny$ideaboard$App$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Modify':
-				var _p32 = _p20._0;
-				var updateCardList = function (_p25) {
-					var _p26 = _p25;
-					var _p29 = _p26._1;
-					var _p28 = _p26._0;
-					if (_elm_lang$core$Native_Utils.eq(_p28, _p32)) {
-						var _p27 = A2(_donny$ideaboard$CardList$update, _p20._1, _p29);
-						var newListModel = _p27._0;
-						var dispatch = _p27._1;
+				var _p34 = _p22._0;
+				var updateCardList = function (_p27) {
+					var _p28 = _p27;
+					var _p31 = _p28._1;
+					var _p30 = _p28._0;
+					if (_elm_lang$core$Native_Utils.eq(_p30, _p34)) {
+						var _p29 = A2(_donny$ideaboard$CardList$update, _p22._1, _p31);
+						var newListModel = _p29._0;
+						var dispatch = _p29._1;
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p28, _1: newListModel},
+							_0: {ctor: '_Tuple2', _0: _p30, _1: newListModel},
 							_1: dispatch
 						};
 					} else {
 						return {
 							ctor: '_Tuple2',
-							_0: {ctor: '_Tuple2', _0: _p28, _1: _p29},
+							_0: {ctor: '_Tuple2', _0: _p30, _1: _p31},
 							_1: _elm_lang$core$Maybe$Nothing
 						};
 					}
 				};
-				var _p30 = _elm_lang$core$List$unzip(
+				var _p32 = _elm_lang$core$List$unzip(
 					A2(_elm_lang$core$List$map, updateCardList, model.lists));
-				var lists = _p30._0;
-				var dispatches = _p30._1;
+				var lists = _p32._0;
+				var dispatches = _p32._1;
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
 					{lists: lists});
-				var _p31 = _elm_lang$core$List$head(
+				var _p33 = _elm_lang$core$List$head(
 					A2(_elm_lang$core$List$filterMap, _elm_lang$core$Basics$identity, dispatches));
-				if (_p31.ctor === 'Nothing') {
+				if (_p33.ctor === 'Nothing') {
 					return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
 				} else {
-					switch (_p31._0.ctor) {
+					switch (_p33._0.ctor) {
 						case 'RequestRename':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A2(_donny$ideaboard$App$REQ_RENAMELIST, _p32, _p31._0._0),
+								A2(_donny$ideaboard$App$REQ_RENAMELIST, _p34, _p33._0._0),
 								newModel);
 						case 'RequestNewCard':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								_donny$ideaboard$App$REQ_NEWCARD(_p32),
+								_donny$ideaboard$App$REQ_NEWCARD(_p34),
 								newModel);
 						case 'RequestRenameCard':
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A3(_donny$ideaboard$App$REQ_RENAMECARD, _p32, _p31._0._0, _p31._0._1),
+								A3(_donny$ideaboard$App$REQ_RENAMECARD, _p34, _p33._0._0, _p33._0._1),
+								newModel);
+						case 'RequestUpvoteCard':
+							return A2(
+								_donny$ideaboard$App$networkRequestHandler,
+								A2(_donny$ideaboard$App$REQ_UPVOTECARD, _p34, _p33._0._0),
 								newModel);
 						default:
 							return A2(
 								_donny$ideaboard$App$networkRequestHandler,
-								A2(_donny$ideaboard$App$REQ_UPVOTECARD, _p32, _p31._0._0),
+								A2(_donny$ideaboard$App$REQ_HIDECARD, _p34, _p33._0._0),
 								newModel);
 					}
 				}
 			case 'SendNetworkRequest':
-				return A2(_donny$ideaboard$App$networkRequestHandler, _p20._0, model);
+				return A2(_donny$ideaboard$App$networkRequestHandler, _p22._0, model);
 			default:
 				return A2(
 					_donny$ideaboard$App$networkResponseHandler,
-					_donny$ideaboard$App$decodeNetworkResponse(_p20._0),
+					_donny$ideaboard$App$decodeNetworkResponse(_p22._0),
 					model);
 		}
 	});
@@ -9387,39 +9549,44 @@ var _donny$ideaboard$App$networkResponseHandler = F2(
 						model,
 						{isProcessing: false}));
 			});
-		var _p33 = resp;
-		switch (_p33.ctor) {
+		var _p35 = resp;
+		switch (_p35.ctor) {
 			case 'RESP_ERROR':
 				return A2(_donny$ideaboard$App$update, _donny$ideaboard$App$NoOp, model);
 			case 'RESP_REFRESH':
 				return A2(
 					handleNetResponse,
-					_donny$ideaboard$App$Refresh(_p33._0),
+					_donny$ideaboard$App$Refresh(_p35._0),
 					model);
 			case 'RESP_NEWLIST':
 				return A2(
 					handleNetResponse,
-					A2(_donny$ideaboard$App$InsertList, _p33._0, _p33._1),
+					A2(_donny$ideaboard$App$InsertList, _p35._0, _p35._1),
 					model);
 			case 'RESP_RENAMELIST':
 				return A2(
 					handleNetResponse,
-					A2(_donny$ideaboard$App$RenameList, _p33._0, _p33._1),
+					A2(_donny$ideaboard$App$RenameList, _p35._0, _p35._1),
 					model);
 			case 'RESP_NEWCARD':
 				return A2(
 					handleNetResponse,
-					A3(_donny$ideaboard$App$InsertCard, _p33._0, _p33._1, _p33._2),
+					A3(_donny$ideaboard$App$InsertCard, _p35._0, _p35._1, _p35._2),
 					model);
 			case 'RESP_RENAMECARD':
 				return A2(
 					handleNetResponse,
-					A3(_donny$ideaboard$App$RenameCard, _p33._0, _p33._1, _p33._2),
+					A3(_donny$ideaboard$App$RenameCard, _p35._0, _p35._1, _p35._2),
+					model);
+			case 'RESP_UPVOTECARD':
+				return A2(
+					handleNetResponse,
+					A3(_donny$ideaboard$App$UpvoteCard, _p35._0, _p35._1, _p35._2),
 					model);
 			default:
 				return A2(
 					handleNetResponse,
-					A3(_donny$ideaboard$App$UpvoteCard, _p33._0, _p33._1, _p33._2),
+					A2(_donny$ideaboard$App$HideCard, _p35._0, _p35._1),
 					model);
 		}
 	});

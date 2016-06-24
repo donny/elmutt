@@ -47,6 +47,7 @@ type Msg
     | InsertCard String String String
     | RenameCard String String String
     | UpvoteCard String String Int
+    | HideCard String String
     | Modify ID CardList.Msg
     | SendNetworkRequest NetworkRequest
     | NetworkResponseDidReceive String
@@ -132,6 +133,13 @@ update msg model =
             in
                 ( { model | lists = newLists }, Cmd.none )
 
+        HideCard listidentifier identifier ->
+            let
+                newLists =
+                    updateItem listidentifier model.lists (\item -> fst (CardList.update (CardList.HidingCard identifier) item))
+            in
+                ( { model | lists = newLists }, Cmd.none )
+
         Modify id listMsg ->
             let
                 updateCardList ( listID, listModel ) =
@@ -165,6 +173,9 @@ update msg model =
 
                     Just (CardList.RequestUpvoteCard cardIdentifier) ->
                         networkRequestHandler (REQ_UPVOTECARD id cardIdentifier) newModel
+
+                    Just (CardList.RequestHideCard cardIdentifier) ->
+                        networkRequestHandler (REQ_HIDECARD id cardIdentifier) newModel
 
         SendNetworkRequest req ->
             networkRequestHandler req model
@@ -246,6 +257,7 @@ type NetworkRequest
     | REQ_NEWCARD String
     | REQ_RENAMECARD String String String
     | REQ_UPVOTECARD String String
+    | REQ_HIDECARD String String
 
 
 type NetworkResponse
@@ -256,6 +268,7 @@ type NetworkResponse
     | RESP_NEWCARD String String String
     | RESP_RENAMECARD String String String
     | RESP_UPVOTECARD String String Int
+    | RESP_HIDECARD String String
 
 
 networkRequestHandler : NetworkRequest -> Model -> ( Model, Cmd Msg )
@@ -286,6 +299,9 @@ networkRequestHandler req model =
             REQ_UPVOTECARD listidentifier cardIdentifier ->
                 handleNetRequest model ("{\"REQ\":\"UPVOTECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}")
 
+            REQ_HIDECARD listidentifier cardIdentifier ->
+                handleNetRequest model ("{\"REQ\":\"HIDECARD\", \"IDENTIFIER\":\"" ++ cardIdentifier ++ "\", \"LISTIDENTIFIER\":\"" ++ listidentifier ++ "\"}")
+
 
 networkResponseHandler : NetworkResponse -> Model -> ( Model, Cmd Msg )
 networkResponseHandler resp model =
@@ -314,6 +330,9 @@ networkResponseHandler resp model =
 
             RESP_UPVOTECARD listidentifier identifier counter ->
                 handleNetResponse (UpvoteCard listidentifier identifier counter) model
+
+            RESP_HIDECARD listidentifier identifier ->
+                handleNetResponse (HideCard listidentifier identifier) model
 
 
 handleDecodedNetworkResponse : Result String a -> (a -> NetworkResponse) -> NetworkResponse
@@ -378,6 +397,13 @@ decodeNetworkResponse message =
                             object3 (,,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string) ("COUNTER" := int)
                     in
                         handleDecodedNetworkResponse (decodeString parsedCard message) (\( listidentifier, identifier, counter ) -> RESP_UPVOTECARD listidentifier identifier counter)
+
+                "RESP_HIDECARD" ->
+                    let
+                        parsedCard =
+                            object2 (,) ("LISTIDENTIFIER" := string) ("IDENTIFIER" := string)
+                    in
+                        handleDecodedNetworkResponse (decodeString parsedCard message) (\( listidentifier, identifier ) -> RESP_HIDECARD listidentifier identifier)
 
                 _ ->
                     RESP_ERROR

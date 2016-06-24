@@ -104,6 +104,7 @@ class Card(models.Model):
     identifier = models.Attribute()
     text = models.Attribute()
     counter = models.Counter()
+    isHidden = models.BooleanField(default=False)
 
 
 class CardList(models.Model):
@@ -173,5 +174,13 @@ def process_message(message):
                   'IDENTIFIER': card.identifier,
                   'LISTIDENTIFIER': message['LISTIDENTIFIER'],
                   'COUNTER': card.counter}
+
+    elif message['REQ'] == 'HIDECARD':
+        card = Card.objects.filter(identifier=message['IDENTIFIER']).first()
+        card.isHidden = True
+        card.save()
+        result = {'RESP': 'RESP_HIDECARD',
+                  'IDENTIFIER': card.identifier,
+                  'LISTIDENTIFIER': message['LISTIDENTIFIER']}
 
     return result

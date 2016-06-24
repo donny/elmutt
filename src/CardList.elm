@@ -1,4 +1,4 @@
-module CardList exposing (Model, Msg(InsertingCard, RenamingCard, UpvotingCard), Dispatch(RequestRename, RequestNewCard, RequestRenameCard, RequestUpvoteCard), model, view, update)
+module CardList exposing (Model, Msg(InsertingCard, RenamingCard, UpvotingCard, HidingCard), Dispatch(..), model, view, update)
 
 import Card
 import Html exposing (..)
@@ -12,6 +12,7 @@ type Dispatch
     | RequestNewCard
     | RequestRenameCard String String
     | RequestUpvoteCard String
+    | RequestHideCard String
 
 
 type alias ID =
@@ -35,6 +36,7 @@ type Msg
     | InsertingCard String String
     | RenamingCard String String
     | UpvotingCard String Int
+    | HidingCard String
     | Modify ID Card.Msg
 
 
@@ -86,6 +88,16 @@ update msg model =
             in
                 ( { model | cards = List.map updateCard model.cards }, Nothing )
 
+        HidingCard identifier ->
+            let
+                updateCard ( cardID, cardModel ) =
+                    if cardID == identifier then
+                        ( cardID, { cardModel | isHidden = True } )
+                    else
+                        ( cardID, cardModel )
+            in
+                ( { model | cards = List.map updateCard model.cards }, Nothing )
+
         Modify id cardMsg ->
             let
                 updateCard ( cardID, cardModel ) =
@@ -113,6 +125,9 @@ update msg model =
 
                     Just (Card.RequestUpvote) ->
                         ( newModel, Just (RequestUpvoteCard id) )
+
+                    Just (Card.RequestHide) ->
+                        ( newModel, Just (RequestHideCard id) )
 
 
 view : Model -> Html Msg
